@@ -12,4 +12,5 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["three.terrain.js"],
   },
+  assetsInclude: ["**/*.glb", "**/*.gltf"],
 });

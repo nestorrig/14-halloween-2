@@ -5,6 +5,7 @@ import { useLoader } from "@react-three/fiber";
 import Terrain from "three.terrain.js";
 import { useControls } from "leva";
 
+
 function createSolidTexture(color) {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 128;
@@ -49,7 +50,7 @@ export function GenerativeTerrain() {
       value: "EaseInWeak",
     },
     size: {
-      value: 264,
+      value: 256,
       min: 64,
       max: 512,
       step: 64,
@@ -98,8 +99,6 @@ export function GenerativeTerrain() {
       }
     });
   });
-
-  // console.log(t1, t2, t3, t4);
 
   // const [t1, t2, t3, t4] = useLoader(THREE.TextureLoader, [
   //   "/textures/terrain/sand1.jpg",
@@ -172,17 +171,17 @@ export function GenerativeTerrain() {
     // Añadir vegetación (foliage) aleatoriamente sobre el terreno
     const geo = terrainScene.children[0].geometry;
 
-    for (let i = 0; i < models.length; i++) {
-      const newAmbient = Terrain.ScatterMeshes(geo, {
-        mesh: models[i],
-        w: terrainControls.size,
-        h: terrainControls.size,
-        spread: 0.05,
-        randomness: Math.random,
-      });
+    // for (let i = 0; i < models.length; i++) {
+    //   const newAmbient = Terrain.ScatterMeshes(geo, {
+    //     mesh: models[i],
+    //     w: terrainControls.size,
+    //     h: terrainControls.size,
+    //     spread: 0.01,
+    //     randomness: Math.random,
+    //   });
 
-      terrainScene.add(newAmbient);
-    }
+    //   terrainScene.add(newAmbient);
+    // }
 
     // Limpiar el terreno cuando el componente se desmonte
     return () => {
@@ -190,5 +189,5 @@ export function GenerativeTerrain() {
     };
   }, [terrainControls]);
 
-  return <group ref={terrainRef}></group>; // Devolvemos el grupo con el terreno
+  return <group position={[0, -64, 0]} ref={terrainRef}></group>; // Devolvemos el grupo con el terreno
 }

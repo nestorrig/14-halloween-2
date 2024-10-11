@@ -1,3 +1,4 @@
 import { GenerativeTerrain } from "./GenerativeTerrain";
+import { Lights } from "./Lights";
 
-export { GenerativeTerrain };
+export { GenerativeTerrain, Lights };
