@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { useLoader } from "@react-three/fiber";
 import Terrain from "three.terrain.js";
 import { useControls } from "leva";
-
+import { RigidBody } from "@react-three/rapier";
 
 function createSolidTexture(color) {
   const canvas = document.createElement("canvas");
@@ -16,8 +16,10 @@ function createSolidTexture(color) {
 }
 
 export function GenerativeTerrain() {
-  const terrainRef = useRef(); // Referencia para el grupo del terreno
-
+  const terrainRef = useRef(); // Referencia para el terreno
+  const [terrainScene, setTerrainScene] = useState(null); // Almacenamos la escena del terreno para react
+  const [decoScene, setDecoScene] = useState(null); // Almacenamos la decoración (árboles, rocas, etc.)
+  const [decoSceneWithoutPhysics, setDecoSceneWithoutPhysics] = useState(null); // Almacenamos la decoración sin físicas
   const terrainControls = useControls("Terrain", {
     heightmap: {
       options: [
@@ -36,7 +38,7 @@ export function GenerativeTerrain() {
         "Value",
         "Weierstrass",
       ],
-      value: "Perlin",
+      value: "DiamondSquare",
     },
     easing: {
       options: [
@@ -50,31 +52,31 @@ export function GenerativeTerrain() {
       value: "EaseInWeak",
     },
     size: {
-      value: 256,
+      value: 254,
       min: 64,
       max: 512,
       step: 64,
     },
     Segments: {
-      value: 48,
+      value: 40,
       min: 16,
       max: 64,
       step: 8,
     },
     maxHeight: {
-      value: 40,
+      value: 32,
       min: 5,
       max: 120,
       step: 5,
     },
     minHeight: {
-      value: -15,
+      value: -12,
       min: -50,
       max: 0,
       step: 5,
     },
     steps: {
-      value: 5,
+      value: 7,
       min: 1,
       max: 8,
       step: 1,
@@ -85,9 +87,13 @@ export function GenerativeTerrain() {
     snow: "#f2efef",
   });
 
+  // Cargar modelos de GLTF
   const models = [
     useLoader(GLTFLoader, "/models/nature/Pine.glb").scene,
     useLoader(GLTFLoader, "/models/nature/Rock Medium.glb").scene,
+  ];
+
+  const modelsWithout = [
     useLoader(GLTFLoader, "/models/nature/Bush with Flowers.glb").scene,
   ];
 
@@ -100,13 +106,15 @@ export function GenerativeTerrain() {
     });
   });
 
-  // const [t1, t2, t3, t4] = useLoader(THREE.TextureLoader, [
-  //   "/textures/terrain/sand1.jpg",
-  //   "/textures/terrain/grass1.jpg",
-  //   "/textures/terrain/stone1.jpg",
-  //   "/textures/terrain/snow1.jpg",
-  // ]);
-  // console.log(t1, t2, t3, t4);
+  modelsWithout.forEach((model) => {
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.position.y -= 0.2;
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  });
 
   useEffect(() => {
     const textureSand = createSolidTexture(terrainControls.sand);
@@ -121,29 +129,22 @@ export function GenerativeTerrain() {
 
     const material = Terrain.generateBlendedMaterial(
       [
-        // The first texture is the base; other textures are blended in on top.
         { texture: textureSand },
-        // Start blending in at height -80; opaque between -35 and 20; blend out by 50
         { texture: textureGrass, levels: [-80, -35, 20, 50] },
         { texture: textureStone, levels: [20, 50, 60, 75] },
-        // How quickly this texture is blended in depends on its x-position.
         {
           texture: textureSnow,
           glsl: "1.0 - smoothstep(65.0 + smoothstep(-256.0, 256.0, vPosition.x) * 10.0, 80.0, vPosition.z)",
         },
-        // Use this texture if the slope is between 27 and 45 degrees
         {
           texture: textureStone,
           glsl: "slope > 0.7853981633974483 ? 0.2 : 1.0 - smoothstep(0.47123889803846897, 0.7853981633974483, slope) + 0.2",
         },
       ],
-      new THREE.MeshStandardMaterial({
-        roughness: 1,
-        metalness: 0,
-      })
+      new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0 })
     );
 
-    // Crear el terreno con la librería THREE.Terrain
+    // Crear el terreno
     const terrain = new Terrain({
       easing: Terrain[terrainControls.easing],
       frequency: 2,
@@ -158,36 +159,80 @@ export function GenerativeTerrain() {
       ySize: terrainControls.size,
     });
 
-    console.log(terrain);
-    terrain.scene.receiveShadow = true; // Permitir que el terreno reciba sombras
-    terrain.mesh.castShadow = true; // Permitir que el terreno emita sombras
-    terrain.mesh.receiveShadow = true; // Permitir que el terreno reciba sombras
+    terrain.scene.receiveShadow = true;
+    terrain.mesh.castShadow = true;
+    terrain.mesh.receiveShadow = true;
 
-    const terrainScene = terrain.getScene(); // Obtener la escena que contiene el terreno
-    console.log(terrainScene);
+    setTerrainScene(terrain.scene); // Guardar el terreno en el estado
 
-    terrainRef.current.add(terrainScene); // Añadir el terreno a la referencia React
+    // Obtener la geometría del terreno
+    const geo = terrain.scene.children[0].geometry;
 
-    // Añadir vegetación (foliage) aleatoriamente sobre el terreno
-    const geo = terrainScene.children[0].geometry;
+    // Usar ScatterMeshes para distribuir los modelos en el terreno
+    let scatterScene = new THREE.Object3D(); // Crear un objeto para la escena de decoración
+    scatterScene.rotateX(-Math.PI / 2); // Rotar la decoración para que se ajuste al terreno
 
-    // for (let i = 0; i < models.length; i++) {
-    //   const newAmbient = Terrain.ScatterMeshes(geo, {
-    //     mesh: models[i],
-    //     w: terrainControls.size,
-    //     h: terrainControls.size,
-    //     spread: 0.01,
-    //     randomness: Math.random,
-    //   });
+    let scatterSceneWithoutPhysics = new THREE.Object3D();
+    scatterSceneWithoutPhysics.rotateX(-Math.PI / 2);
 
-    //   terrainScene.add(newAmbient);
-    // }
+    models.forEach((model) => {
+      const newAmbient = Terrain.ScatterMeshes(geo, {
+        mesh: model, // Pasamos el modelo que queremos distribuir
+        w: terrainControls.size,
+        h: terrainControls.size,
+        spread: 0.03,
+        randomness: Math.random,
+      });
 
-    // Limpiar el terreno cuando el componente se desmonte
+      scatterScene.add(newAmbient); // Añadir la nueva decoración a la escena
+    });
+
+    setDecoScene(scatterScene); // Guardamos la decoración generada en el estado
+
+    modelsWithout.forEach((model) => {
+      const newAmbient = Terrain.ScatterMeshes(geo, {
+        mesh: model,
+        w: terrainControls.size,
+        h: terrainControls.size,
+        spread: 0.06,
+        randomness: Math.random,
+      });
+
+      scatterSceneWithoutPhysics.add(newAmbient);
+    });
+
+    setDecoSceneWithoutPhysics(scatterSceneWithoutPhysics);
+
     return () => {
-      if (terrainRef.current) terrainRef.current.remove(terrainScene);
+      if (terrainRef.current) terrainRef.current.remove(terrain.scene);
     };
   }, [terrainControls]);
 
-  return <group position={[0, -64, 0]} ref={terrainRef}></group>; // Devolvemos el grupo con el terreno
+  return (
+    <group position={[0, -64, 0]} ref={terrainRef}>
+      {/* Renderizar el terreno */}
+      {terrainScene && (
+        <RigidBody type="fixed" colliders="trimesh">
+          <primitive object={terrainScene} />
+        </RigidBody>
+      )}
+
+      {/* Renderizar los modelos distribuidos */}
+      {decoScene && (
+        <RigidBody
+          type="fixed"
+          colliders="hull"
+          onCollisionEnter={() => {
+            console.log("Collision");
+          }}
+        >
+          <primitive object={decoScene} />
+        </RigidBody>
+      )}
+
+      {decoSceneWithoutPhysics && (
+        <primitive object={decoSceneWithoutPhysics} />
+      )}
+    </group>
+  );
 }

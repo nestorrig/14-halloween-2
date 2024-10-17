@@ -97,9 +97,9 @@ function App() {
             </mesh>
           </RigidBody>
 
-          <RigidBody type="fixed" position={[0, 0, 0]} colliders="trimesh">
-            <GenerativeTerrain />
-          </RigidBody>
+          <GenerativeTerrain />
+          {/* <RigidBody type="fixed" position={[0, 0, 0]} colliders="trimesh">
+          </RigidBody> */}
 
           <KeyboardControls map={keyboardMap}>
             <Ecctrl
