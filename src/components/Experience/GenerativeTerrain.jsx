@@ -16,6 +16,68 @@ function createSolidTexture(color) {
 }
 
 export function GenerativeTerrain() {
+  const models = [
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Pine.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Pine 2.glb").scene,
+      spread: 0.005,
+    },
+  ];
+
+  const modelsWithoutPhysics = [
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Pebble Round.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Fern.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Clover.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Plant.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Mushroom.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Pebble Round 2.glb").scene,
+      spread: 0.01,
+    },
+    {
+      model: useLoader(GLTFLoader, "/models/nature/Grass Wispy.glb").scene,
+      spread: 0.01,
+    },
+  ];
+
+  modelsWithoutPhysics[1].model.children[0].scale.set(0.3, 0.3, 0.3);
+
+  models.forEach((model) => {
+    model.model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  });
+
+  modelsWithoutPhysics.forEach((model) => {
+    model.model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  });
+
   const terrainRef = useRef(); // Referencia para el terreno
   const [terrainScene, setTerrainScene] = useState(null); // Almacenamos la escena del terreno para react
   const [decoScene, setDecoScene] = useState(null); // Almacenamos la decoración (árboles, rocas, etc.)
@@ -52,31 +114,31 @@ export function GenerativeTerrain() {
       value: "EaseInWeak",
     },
     size: {
-      value: 254,
+      value: 150,
       min: 64,
       max: 512,
       step: 64,
     },
     Segments: {
-      value: 40,
+      value: 64,
       min: 16,
       max: 64,
       step: 8,
     },
     maxHeight: {
-      value: 32,
+      value: 30,
       min: 5,
       max: 120,
       step: 5,
     },
     minHeight: {
-      value: -12,
+      value: -10,
       min: -50,
       max: 0,
       step: 5,
     },
     steps: {
-      value: 7,
+      value: 8,
       min: 1,
       max: 8,
       step: 1,
@@ -85,35 +147,6 @@ export function GenerativeTerrain() {
     grass: "#1a4519",
     stone: "#3e2b2b",
     snow: "#f2efef",
-  });
-
-  // Cargar modelos de GLTF
-  const models = [
-    useLoader(GLTFLoader, "/models/nature/Pine.glb").scene,
-    useLoader(GLTFLoader, "/models/nature/Rock Medium.glb").scene,
-  ];
-
-  const modelsWithout = [
-    useLoader(GLTFLoader, "/models/nature/Bush with Flowers.glb").scene,
-  ];
-
-  models.forEach((model) => {
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-  });
-
-  modelsWithout.forEach((model) => {
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.position.y -= 0.2;
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
   });
 
   useEffect(() => {
@@ -175,30 +208,23 @@ export function GenerativeTerrain() {
     let scatterSceneWithoutPhysics = new THREE.Object3D();
     scatterSceneWithoutPhysics.rotateX(-Math.PI / 2);
 
+    // Distribuir los modelos en el terreno
     models.forEach((model) => {
-      const newAmbient = Terrain.ScatterMeshes(geo, {
-        mesh: model, // Pasamos el modelo que queremos distribuir
-        w: terrainControls.size,
-        h: terrainControls.size,
-        spread: 0.03,
-        randomness: Math.random,
+      const scatter = Terrain.ScatterMeshes(geo, {
+        mesh: model.model,
+        spread: model.spread,
       });
-
-      scatterScene.add(newAmbient); // Añadir la nueva decoración a la escena
+      scatterScene.add(scatter);
     });
 
-    setDecoScene(scatterScene); // Guardamos la decoración generada en el estado
+    setDecoScene(scatterScene);
 
-    modelsWithout.forEach((model) => {
-      const newAmbient = Terrain.ScatterMeshes(geo, {
-        mesh: model,
-        w: terrainControls.size,
-        h: terrainControls.size,
-        spread: 0.06,
-        randomness: Math.random,
+    modelsWithoutPhysics.forEach((model) => {
+      const scatter = Terrain.ScatterMeshes(geo, {
+        mesh: model.model,
+        spread: model.spread,
       });
-
-      scatterSceneWithoutPhysics.add(newAmbient);
+      scatterSceneWithoutPhysics.add(scatter);
     });
 
     setDecoSceneWithoutPhysics(scatterSceneWithoutPhysics);
@@ -209,7 +235,7 @@ export function GenerativeTerrain() {
   }, [terrainControls]);
 
   return (
-    <group position={[0, -64, 0]} ref={terrainRef}>
+    <group position={[0, -24, 0]} ref={terrainRef}>
       {/* Renderizar el terreno */}
       {terrainScene && (
         <RigidBody type="fixed" colliders="trimesh">

@@ -14,24 +14,24 @@ export const Lights = () => {
     },
     directionalLightX: {
       value: 0,
-      min: -128,
-      max: 128,
+      min: -75,
+      max: 75,
       name: "Sun X",
     },
     directionalLightY: {
-      value: 128,
-      min: -128,
-      max: 128,
+      value: 75,
+      min: -75,
+      max: 75,
       name: "Sun Y",
     },
     directionalLightZ: {
-      value: -90,
-      min: -128,
-      max: 128,
+      value: -75,
+      min: -75,
+      max: 75,
       name: "Sun Z",
     },
     ambientLightIntensity: {
-      value: 2,
+      value: 0.5,
       min: 0,
       max: 10,
       name: "Ambient Intensity",
@@ -68,13 +68,13 @@ export const Lights = () => {
         ]}
         intensity={light.directionalLightIntensity}
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-far={256}
-        shadow-camera-left={-128}
-        shadow-camera-right={128}
-        shadow-camera-top={128}
-        shadow-camera-bottom={-128}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={200}
+        shadow-camera-left={-75}
+        shadow-camera-right={75}
+        shadow-camera-top={75}
+        shadow-camera-bottom={-75}
       />
       <Helper object={lightRef} />
     </>

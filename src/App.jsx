@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { GenerativeTerrain, Lights } from "./components/Experience";
 import { useControls } from "leva";
-import { Helper, KeyboardControls, OrbitControls } from "@react-three/drei";
+import { KeyboardControls, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { Physics, RigidBody } from "@react-three/rapier";
 import Ecctrl, { EcctrlAnimation, EcctrlJoystick } from "ecctrl";
@@ -22,11 +22,12 @@ function App() {
       max: 100,
     },
     far: {
-      value: 100,
+      value: 16,
       min: 0,
       max: 100,
     },
     active: false,
+    // active: true, // This is the default value
     rotateY: {
       value: Math.PI / 4,
       min: 0,
@@ -89,17 +90,15 @@ function App() {
           <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
         )}
 
-        <Physics debug>
+        <Physics>
           <RigidBody type="fixed" colliders="trimesh">
             <mesh rotation={[fog.rotateX, fog.rotateY, fog.rotateZ]}>
-              <cylinderGeometry args={[180, 180, 180, 4, 1, true]} />
+              <cylinderGeometry args={[106, 106, 106, 4, 1, true]} />
               <meshStandardMaterial color={fog.color} side={THREE.DoubleSide} />
             </mesh>
           </RigidBody>
 
           <GenerativeTerrain />
-          {/* <RigidBody type="fixed" position={[0, 0, 0]} colliders="trimesh">
-          </RigidBody> */}
 
           <KeyboardControls map={keyboardMap}>
             <Ecctrl
@@ -109,7 +108,7 @@ function App() {
               debug
               capsuleHalfHeight={0.5}
               // rayLength={0}
-              position={[0, -20, 0]}
+              position={[0, 32, 0]}
               // capsuleHalfHeight={0.8}
               // slopeRayOriginOffest={[0, 0.8, 0]}
               // headRayOriginOffest={[0, 0.8, 0]}
