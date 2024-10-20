@@ -1,3 +1,4 @@
 import { Adventurer } from "./Adventurer";
+import { Zombie } from "./Zombie";
 
-export { Adventurer };
+export { Adventurer, Zombie };

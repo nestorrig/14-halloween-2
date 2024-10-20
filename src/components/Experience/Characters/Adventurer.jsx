@@ -14,9 +14,6 @@ export function Adventurer(props) {
   const { scene, animations } = useGLTF("/models/characters/Adventurer.glb");
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
   const { nodes, materials } = useGraph(clone);
-
-  console.log(nodes);
-
   const { actions } = useAnimations(animations, group);
 
   // const { scene: gunScene } = useGLTF("/models/weapons/Revolver.glb"); // Cargar arma
@@ -24,7 +21,6 @@ export function Adventurer(props) {
   // const { scene: gunScene } = useGLTF("/models/weapons/Bayonet.glb"); // Cargar arma
 
   const { position } = nodes.WristR; // Posición del hueso de la muñeca derecha
-  console.log(actions);
 
   useControls("Adventurer", {
     "Gun x": {
@@ -81,14 +77,6 @@ export function Adventurer(props) {
       nodes.WristR.remove(gunScene); // Remover arma del hueso de la muñeca dere
     };
   }, []);
-
-  React.useEffect(() => {
-    console.log(gunScene.position);
-
-    return () => {
-      console.log(gunScene.position);
-    };
-  }, [gunScene]);
 
   return (
     <group ref={group} {...props} dispose={null}>
@@ -254,17 +242,6 @@ export function Adventurer(props) {
           </group>
         </group>
       </group>
-      {/* <primitive
-        object={nodes.WristR}
-        position={[position.x, position.y, position.z]}
-      ></primitive>
-      <primitive
-        object={gunScene}
-        position={[-0.25, 1, 0]} // Ajusta la posición del arma en relación a la muñeca
-        // position={[position.x, position.y, position.z]} // Ajusta la posición del arma en relación a la muñeca
-        rotation={[Math.PI / 2, Math.PI * 1.5, 0]} // Ajusta la rotación si es necesario
-        scale={0.15} // Ajusta la escala del arma
-      /> */}
     </group>
   );
 }

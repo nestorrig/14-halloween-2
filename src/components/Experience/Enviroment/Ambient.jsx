@@ -1,10 +1,7 @@
-import React, { useRef, useEffect } from "react";
-import * as THREE from "three";
-import { useThree } from "@react-three/fiber";
+import React, { useRef } from "react";
 import { useControls } from "leva";
-import { Helper, useHelper } from "@react-three/drei";
 
-export const Lights = () => {
+export const Ambient = () => {
   const light = useControls("Sun Position", {
     directionalLightIntensity: {
       value: 1.5,
@@ -58,6 +55,8 @@ export const Lights = () => {
 
   return (
     <>
+      <color attach="background" args={["#0d0d0d"]} />
+      {/* <fog attach="fog" args={["#0d0d0d", 0, 16]} /> */}
       <ambientLight intensity={light.ambientLightIntensity} />
       <directionalLight
         ref={lightRef}
@@ -76,7 +75,6 @@ export const Lights = () => {
         shadow-camera-top={75}
         shadow-camera-bottom={-75}
       />
-      <Helper object={lightRef} />
     </>
   );
 };
