@@ -7,13 +7,88 @@ import React from "react";
 import { useGraph } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
+import { useControls } from "leva";
 
 export function Adventurer(props) {
   const group = React.useRef();
   const { scene, animations } = useGLTF("/models/characters/Adventurer.glb");
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
   const { nodes, materials } = useGraph(clone);
+
+  console.log(nodes);
+
   const { actions } = useAnimations(animations, group);
+
+  // const { scene: gunScene } = useGLTF("/models/weapons/Revolver.glb"); // Cargar arma
+  const { scene: gunScene } = useGLTF("/models/weapons/Pistol.glb"); // Cargar arma
+  // const { scene: gunScene } = useGLTF("/models/weapons/Bayonet.glb"); // Cargar arma
+
+  const { position } = nodes.WristR; // Posición del hueso de la muñeca derecha
+  console.log(actions);
+
+  useControls("Adventurer", {
+    "Gun x": {
+      value: gunScene.position.x,
+      step: 0.01,
+      onChange: (x) => (gunScene.position.x = x),
+    },
+    "Gun y": {
+      value: gunScene.position.y,
+      step: 0.01,
+      onChange: (y) => (gunScene.position.y = y),
+    },
+    "Gun z": {
+      value: gunScene.position.z,
+      step: 0.01,
+      onChange: (z) => (gunScene.position.z = z),
+    },
+
+    "Gun rotation x": {
+      value: -0.11,
+      min: -Math.PI * 2,
+      max: Math.PI * 2,
+      step: 0.01,
+      onChange: (x) => (gunScene.rotation.x = x),
+    },
+
+    "Gun rotation y": {
+      value: -0.11,
+      min: -Math.PI * 2,
+      max: Math.PI * 2,
+      step: 0.01,
+      onChange: (y) => (gunScene.rotation.y = y),
+    },
+
+    "Gun rotation z": {
+      value: -4.94,
+      min: -Math.PI * 2,
+      max: Math.PI * 2,
+      step: 0.01,
+      onChange: (z) => (gunScene.rotation.z = z),
+    },
+  });
+
+  React.useEffect(() => {
+    nodes.WristR.add(gunScene); // Agregar arma al hueso de la muñeca derecha
+    gunScene.rotation.set(-0.11, -0.11, -4.94); // Ajustar la rotación si es necesario
+    gunScene.position.set(
+      position.x - 0.0001,
+      position.y - 0.001,
+      position.z - 0.0002
+    ); // Ajustar la posición del arma en relación a la muñeca
+    gunScene.scale.set(0.0015, 0.0015, 0.0015); // Ajustar la escala del arma
+    return () => {
+      nodes.WristR.remove(gunScene); // Remover arma del hueso de la muñeca dere
+    };
+  }, []);
+
+  React.useEffect(() => {
+    console.log(gunScene.position);
+
+    return () => {
+      console.log(gunScene.position);
+    };
+  }, [gunScene]);
 
   return (
     <group ref={group} {...props} dispose={null}>
@@ -179,8 +254,22 @@ export function Adventurer(props) {
           </group>
         </group>
       </group>
+      {/* <primitive
+        object={nodes.WristR}
+        position={[position.x, position.y, position.z]}
+      ></primitive>
+      <primitive
+        object={gunScene}
+        position={[-0.25, 1, 0]} // Ajusta la posición del arma en relación a la muñeca
+        // position={[position.x, position.y, position.z]} // Ajusta la posición del arma en relación a la muñeca
+        rotation={[Math.PI / 2, Math.PI * 1.5, 0]} // Ajusta la rotación si es necesario
+        scale={0.15} // Ajusta la escala del arma
+      /> */}
     </group>
   );
 }
 
 useGLTF.preload("/models/characters/Adventurer.glb");
+useGLTF.preload("/models/weapons/Pistol.glb");
+useGLTF.preload("/models/weapons/Revolver.glb");
+useGLTF.preload("/models/weapons/Bayonet.glb");
