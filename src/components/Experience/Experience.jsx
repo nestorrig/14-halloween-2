@@ -4,6 +4,7 @@ import { Physics } from "@react-three/rapier";
 import { EcctrlJoystick } from "ecctrl";
 import { Ambient, GenerativeTerrain, PerimeterWall } from "./Enviroment";
 import { Controller } from "./Gaming";
+import { Suspense } from "react";
 
 export const Experience = () => {
   return (
@@ -12,15 +13,13 @@ export const Experience = () => {
       <Canvas shadows>
         <Ambient />
         <OrbitControls />
-
-        <Physics
-          // debug
-          gravity={[0, -9.8, 0]}
-        >
-          <PerimeterWall />
-          <GenerativeTerrain />
-          <Controller />
-        </Physics>
+        <Suspense fallback={null}>
+          <Physics debug gravity={[0, -9.8, 0]}>
+            <PerimeterWall />
+            <GenerativeTerrain />
+            <Controller />
+          </Physics>
+        </Suspense>
       </Canvas>
     </>
   );

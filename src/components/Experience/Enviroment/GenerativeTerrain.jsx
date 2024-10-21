@@ -5,6 +5,9 @@ import { useLoader } from "@react-three/fiber";
 import Terrain from "three.terrain.js";
 import { useControls } from "leva";
 import { RigidBody } from "@react-three/rapier";
+import { useAnimations } from "@react-three/drei";
+import { SkeletonUtils } from "three/examples/jsm/Addons.js";
+import { Zombie } from "../Characters";
 
 function createSolidTexture(color) {
   const canvas = document.createElement("canvas");
@@ -46,14 +49,6 @@ export function GenerativeTerrain() {
     },
     {
       model: useLoader(GLTFLoader, "/models/nature/Mushroom.glb").scene,
-      spread: 0.01,
-    },
-    {
-      model: useLoader(GLTFLoader, "/models/nature/Pebble Round 2.glb").scene,
-      spread: 0.01,
-    },
-    {
-      model: useLoader(GLTFLoader, "/models/nature/Grass Wispy.glb").scene,
       spread: 0.01,
     },
   ];
@@ -234,6 +229,27 @@ export function GenerativeTerrain() {
     };
   }, [terrainControls]);
 
+  const ZombiesControls = useControls("Zombies", {
+    rotateX: {
+      value: 0,
+      min: -Math.PI,
+      max: Math.PI,
+      step: 0.1,
+    },
+    rotateY: {
+      value: 0,
+      min: -Math.PI,
+      max: Math.PI,
+      step: 0.1,
+    },
+    rotateZ: {
+      value: 0,
+      min: -Math.PI,
+      max: Math.PI,
+      step: 0.1,
+    },
+  });
+
   return (
     <group position={[0, -24, 0]} ref={terrainRef}>
       {/* Renderizar el terreno */}
@@ -248,9 +264,9 @@ export function GenerativeTerrain() {
         <RigidBody
           type="fixed"
           colliders="hull"
-          onCollisionEnter={() => {
-            console.log("Collision");
-          }}
+          // onCollisionEnter={() => {
+          //   console.log("Collision");
+          // }}
         >
           <primitive object={decoScene} />
         </RigidBody>
@@ -259,6 +275,32 @@ export function GenerativeTerrain() {
       {decoSceneWithoutPhysics && (
         <primitive object={decoSceneWithoutPhysics} />
       )}
+
+      <group
+        scale={0.5}
+        rotation={[
+          ZombiesControls.rotateX,
+          ZombiesControls.rotateY,
+          ZombiesControls.rotateZ,
+        ]}
+      >
+        {decoSceneWithoutPhysics &&
+          decoSceneWithoutPhysics.children[0].children.map(
+            (zombie, i, array) => {
+              return (
+                <Zombie
+                  key={i}
+                  position={[
+                    zombie.position.x,
+                    zombie.position.z + 30,
+                    zombie.position.y,
+                  ]}
+                  scale={zombie.scale}
+                />
+              );
+            }
+          )}
+      </group>
     </group>
   );
 }
