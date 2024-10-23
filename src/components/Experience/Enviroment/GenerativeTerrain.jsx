@@ -5,9 +5,6 @@ import { useLoader } from "@react-three/fiber";
 import Terrain from "three.terrain.js";
 import { useControls } from "leva";
 import { RigidBody } from "@react-three/rapier";
-import { useAnimations } from "@react-three/drei";
-import { SkeletonUtils } from "three/examples/jsm/Addons.js";
-import { Zombie } from "../Characters";
 
 function createSolidTexture(color) {
   const canvas = document.createElement("canvas");
@@ -276,36 +273,6 @@ export function GenerativeTerrain() {
         <primitive object={decoSceneWithoutPhysics} />
       )}
 
-      <group
-        scale={0.5}
-        rotation={[
-          ZombiesControls.rotateX,
-          ZombiesControls.rotateY,
-          ZombiesControls.rotateZ,
-        ]}
-      >
-        <Zombie
-          // key={i}
-          position={[10, 30, 10]}
-          // scale={zombie.scale}
-        />
-        {/* {decoSceneWithoutPhysics &&
-          decoSceneWithoutPhysics.children[0].children.map(
-            (zombie, i, array) => {
-              return (
-                <Zombie
-                  key={i}
-                  position={[
-                    zombie.position.x,
-                    zombie.position.z + 30,
-                    zombie.position.y,
-                  ]}
-                  scale={zombie.scale}
-                />
-              );
-            }
-          )} */}
-      </group>
     </group>
   );
 }

@@ -8,28 +8,35 @@ import { useGameContext } from "../../../context/GameContext";
 
 const capsuleRadius = 0.8;
 const capsuleHalfHeight = 0.8;
-const attackDistance = 0.5;
-const detectDistance = 5;
+const attackDistance = 1;
+const detectDistance = 8;
 
 export function Zombie(props) {
   const group = useRef();
   const { scene, animations } = useGLTF("/models/characters/Zombie_2.glb");
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
   const { nodes, materials } = useGraph(clone);
-  const { actions } = useAnimations(animations, group);
+  const { actions, mixer } = useAnimations(animations, group);
 
   const { playerPosition } = useGameContext(); // Obtener la posición del jugador
   const [zombieState, setZombieState] = useState("patrolling"); // Estados: "patrolling", "attacking", "growling", "dying"
   const [animation, setAnimation] = useState("Armature|Walk"); // Animación actual
   const [health, setHealth] = useState(100); // Salud del zombie
   const [direction, setDirection] = useState(new THREE.Vector3()); // Dirección del movimiento
-  const [speed, setSpeed] = useState(0.03);
   const growlInterval = useRef(null);
 
-  // Función para cambiar animaciones
+  // Variable local para la velocidad
+  let speed = 0.03;
+  const randomGrowlLapse = () => {
+    return Math.random() * (20 - 10) + 10;
+  };
+
+  // Función para cambiar animaciones con control de estado
   const changeAnimation = (newAnimation) => {
-    if (animation !== newAnimation) {
-      setAnimation(newAnimation);
+    if (animation !== newAnimation && actions[newAnimation]) {
+      actions[animation]?.fadeOut(0.5); // Asegúrate de que la animación anterior termine
+      actions[newAnimation].reset().fadeIn(0.5).play();
+      setAnimation(newAnimation); // Actualiza el estado de animación
     }
   };
 
@@ -52,28 +59,28 @@ export function Zombie(props) {
     const directionToPlayer = new THREE.Vector3()
       .subVectors(playerPos, zombiePosition)
       .normalize();
-    group.current.position.add(directionToPlayer.multiplyScalar(speed));
-    group.current.lookAt(playerPos); // Mirar hacia el jugador
+
+    // Verificar la distancia para evitar curvas innecesarias
+    if (directionToPlayer.length() > 0.01) {
+      group.current.position.add(directionToPlayer.multiplyScalar(speed));
+      group.current.lookAt(playerPos); // Mirar hacia el jugador
+    }
   };
 
-  // Manejo de gruñidos ocasionales y cambio de dirección durante la patrulla
+  // Manejo de gruñidos y cambio de dirección en patrullaje
   useEffect(() => {
-    if (zombieState === "patrolling") {
-      setDirection(randomDirection()); // Cambiar la dirección al patrullar
-    }
-
     const patrolInterval = setInterval(() => {
       if (zombieState === "patrolling") {
-        setDirection(randomDirection()); // Cambiar la dirección aleatoriamente
+        setDirection(randomDirection()); // Cambiar la dirección
       }
-    }, 4000);
+    }, 5000); // Cambiar de dirección cada 4 segundos
 
     growlInterval.current = setInterval(() => {
       if (zombieState === "patrolling") {
         setZombieState("growling");
         changeAnimation("Armature|Scream");
       }
-    }, 10000); // Gruñir cada 10 segundos
+    }, randomGrowlLapse() * 1000);
 
     return () => {
       clearInterval(patrolInterval);
@@ -81,15 +88,7 @@ export function Zombie(props) {
     };
   }, [zombieState]);
 
-  // Cambiar animación al estado correspondiente
-  useEffect(() => {
-    if (!actions[animation]) return;
-    actions[animation].reset().fadeIn(0.5).play();
-
-    return () => actions[animation].fadeOut(0.5);
-  }, [animation, actions]);
-
-  // Manejo por frame
+  // Lógica de estados y animaciones por frame
   useFrame(() => {
     if (!group.current) return;
 
@@ -97,30 +96,33 @@ export function Zombie(props) {
     const playerPos = new THREE.Vector3(...playerPosition);
     const distanceToPlayer = zombiePosition.distanceTo(playerPos);
 
-    // Manejo del estado del zombie
     switch (zombieState) {
       case "growling":
+        if (distanceToPlayer < detectDistance) return; // No gruñir si el jugador está cerca
         setTimeout(() => {
           setZombieState("patrolling");
           changeAnimation("Armature|Walk");
-        }, 2000); // Volver a patrullar después de 2 segundos de gruñido
+        }, 1000);
         break;
 
       case "attacking":
         if (distanceToPlayer > attackDistance) {
           setZombieState("patrolling");
-          changeAnimation("Armature|Walk");
+        } else {
+          changeAnimation("Armature|Attack");
         }
         break;
 
       case "patrolling":
         if (distanceToPlayer < detectDistance) {
+          setZombieState("attacking");
           changeAnimation("Armature|Running_Crawl");
-          setSpeed(0.12); // Aumentar la velocidad al detectar al jugador
-          chasePlayer(playerPos, zombiePosition); // Perseguir al jugador
+          speed = 0.2; // Aumentar la velocidad durante la persecución
+          chasePlayer(playerPos, zombiePosition);
         } else {
-          setSpeed(0.03); // Restaurar la velocidad de patrulla
-          patrol(); // Continuar patrullando
+          changeAnimation("Armature|Walk");
+          speed = 0.03; // Velocidad estándar de patrullaje
+          patrol();
         }
         break;
 
@@ -132,7 +134,7 @@ export function Zombie(props) {
         break;
     }
 
-    // Si la salud del zombie llega a 0, activar la animación de muerte
+    // Muerte del zombie
     if (health <= 0 && zombieState !== "dying") {
       setZombieState("dying");
     }

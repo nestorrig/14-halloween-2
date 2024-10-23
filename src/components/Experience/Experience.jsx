@@ -3,7 +3,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 import { EcctrlJoystick } from "ecctrl";
 import { Ambient, GenerativeTerrain, PerimeterWall } from "./Enviroment";
-import { Controller } from "./Gaming";
+import { Controller, Enemies } from "./Gaming";
 import { Suspense } from "react";
 
 export const Experience = () => {
@@ -14,7 +14,8 @@ export const Experience = () => {
         <Ambient />
         <OrbitControls />
         <Suspense fallback={null}>
-          <Physics debug gravity={[0, -9.8, 0]}>
+          <Physics gravity={[0, -9.8, 0]}>
+            <Enemies />
             <PerimeterWall />
             <GenerativeTerrain />
             <Controller />
