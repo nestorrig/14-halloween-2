@@ -52,13 +52,7 @@ export const Controller = () => {
         animated
         debug
         capsuleHalfHeight={0.5}
-        // rayLength={0}
         position={[0, 32, 0]}
-        // capsuleHalfHeight={0.8}
-        // slopeRayOriginOffest={[0, 0.8, 0]}
-        // headRayOriginOffest={[0, 0.8, 0]}
-        // camCollisionOffset={0.5}
-        // rayOriginOffest={[0, -0.4, 0]}
       >
         <EcctrlAnimation
           animationSet={animationSet}
@@ -67,7 +61,6 @@ export const Controller = () => {
           <group position={[0, -1, 0]} visible={true}>
             <Adventurer />
           </group>
-          s
         </EcctrlAnimation>
       </Ecctrl>
     </KeyboardControls>

@@ -284,7 +284,12 @@ export function GenerativeTerrain() {
           ZombiesControls.rotateZ,
         ]}
       >
-        {decoSceneWithoutPhysics &&
+        <Zombie
+          // key={i}
+          position={[10, 30, 10]}
+          // scale={zombie.scale}
+        />
+        {/* {decoSceneWithoutPhysics &&
           decoSceneWithoutPhysics.children[0].children.map(
             (zombie, i, array) => {
               return (
@@ -299,7 +304,7 @@ export function GenerativeTerrain() {
                 />
               );
             }
-          )}
+          )} */}
       </group>
     </group>
   );

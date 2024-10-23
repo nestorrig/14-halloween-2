@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
-export const useGameLogic = () => {
+export const useGameLogic = ({ playerRef }) => {
   const [gameOver, setGameOver] = useState(false);
   const [health, setHealth] = useState(100);
   const [score, setScore] = useState(0);
@@ -11,6 +11,7 @@ export const useGameLogic = () => {
   const [zombies, setZombies] = useState([]); // Estado para manejar los zombies
   const characterRef = useRef();
   const zombiesRef = useRef([]); // Array de referencias para los zombies
+  const [playerPosition, setPlayerPosition] = useState([0, 0, 0]);
 
   // Estado de la salud de los zombies
   const [zombiesHealth, setZombiesHealth] = useState(Array(10).fill(100));
@@ -69,6 +70,13 @@ export const useGameLogic = () => {
     setTime((prevTime) => prevTime + value);
   };
 
+  useEffect(() => {
+    if (playerRef && playerRef.current) {
+      console.log("Player reference is available:", playerRef.current);
+      // Aquí puedes agregar cualquier lógica que dependa de `playerRef`
+    }
+  }, [playerRef]);
+
   return {
     gameOver,
     health,
@@ -91,5 +99,7 @@ export const useGameLogic = () => {
     zombiesRef,
     zombiesHealth,
     setZombiesHealth,
+    playerPosition,
+    setPlayerPosition,
   };
 };

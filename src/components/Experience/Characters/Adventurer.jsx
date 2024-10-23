@@ -4,10 +4,13 @@ Command: npx gltfjsx@6.5.2 public/models/characters/Adventurer.glb -o src/compon
 */
 
 import React from "react";
-import { useGraph } from "@react-three/fiber";
+import { useFrame, useGraph } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 import { useControls } from "leva";
+import { useGameLogic } from "../../../hooks/useGameLogic";
+import * as THREE from "three";
+import { useGameContext } from "../../../context/GameContext";
 
 export function Adventurer(props) {
   const group = React.useRef();
@@ -21,6 +24,8 @@ export function Adventurer(props) {
   // const { scene: gunScene } = useGLTF("/models/weapons/Bayonet.glb"); // Cargar arma
 
   const { position } = nodes.WristR; // Posición del hueso de la muñeca derecha
+
+  const gameLogic = useGameLogic({ playerRef: group });
 
   useControls("Adventurer", {
     "Gun x": {
@@ -64,6 +69,8 @@ export function Adventurer(props) {
     },
   });
 
+  const { playerRef, setPlayerPosition } = useGameContext();
+
   React.useEffect(() => {
     nodes.WristR.add(gunScene); // Agregar arma al hueso de la muñeca derecha
     gunScene.rotation.set(-0.11, -0.11, -4.94); // Ajustar la rotación si es necesario
@@ -77,6 +84,17 @@ export function Adventurer(props) {
       nodes.WristR.remove(gunScene); // Remover arma del hueso de la muñeca dere
     };
   }, []);
+
+  React.useEffect(() => {
+    if (!group.current) return;
+    playerRef.current = group.current; // Actualiza la referencia del jugador
+  }, [group, playerRef]);
+
+  useFrame(() => {
+    if (!group.current) return;
+    const worldPosition = group.current.getWorldPosition(new THREE.Vector3());
+    setPlayerPosition([worldPosition.x, worldPosition.y, worldPosition.z]);
+  });
 
   return (
     <group ref={group} {...props} dispose={null}>
