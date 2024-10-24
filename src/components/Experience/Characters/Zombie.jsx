@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, act } from "react";
 import { useFrame, useGraph } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
@@ -18,7 +18,7 @@ export function Zombie(props) {
   const { nodes, materials } = useGraph(clone);
   const { actions, mixer } = useAnimations(animations, group);
 
-  const { playerPosition } = useGameContext(); // Obtener la posición del jugador
+  const { playerPosition, setPlayerHealth, setHitReceived } = useGameContext(); // Obtener la posición del jugador
   const [zombieState, setZombieState] = useState("patrolling"); // Estados: "patrolling", "attacking", "growling", "dying"
   const [animation, setAnimation] = useState("Armature|Walk"); // Animación actual
   const [health, setHealth] = useState(100); // Salud del zombie
@@ -30,6 +30,26 @@ export function Zombie(props) {
   const randomGrowlLapse = () => {
     return Math.random() * (20 - 10) + 10;
   };
+
+  // mixer.addEventListener("finished", (e) => {
+  //   console.log("Animation finished: ", e);
+  // });
+
+  useEffect(() => {
+    console.log(mixer);
+
+    const fn = (e) => {
+      let name = e.action.getClip().name;
+      console.log("Animation looped: ", name);
+      if (name === "Armature|Attack") {
+        setPlayerHealth((prevHealth) => prevHealth - 1); // Dañar al jugador
+      }
+    };
+
+    return () => {
+      mixer.removeEventListener("loop", fn);
+    };
+  }, [mixer]);
 
   // Función para cambiar animaciones con control de estado
   const changeAnimation = (newAnimation) => {
@@ -132,6 +152,16 @@ export function Zombie(props) {
 
       default:
         break;
+    }
+
+    if (animation === "Armature|Attack") {
+      if (distanceToPlayer < attackDistance) {
+        if (actions[animation].time > 0.9 && actions[animation].time < 1.2) {
+          setPlayerHealth((prevHealth) => prevHealth - 1); // Dañar al jugador
+          setHitReceived(true);
+          setTimeout(() => setHitReceived(false), 1000);
+        }
+      }
     }
 
     // Muerte del zombie

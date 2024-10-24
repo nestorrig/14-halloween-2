@@ -26,10 +26,10 @@ export const Controller = () => {
     jumpLand: "CharacterArmature|Idle",
     fall: "CharacterArmature|Idle", // This is for falling from high sky
     // Currently support four additional animations
-    action1: "CharacterArmature|Idle_Gun_Pointing",
-    action2: "CharacterArmature|Gun_Shoot",
-    action3: "CharacterArmature|Punch_Left",
-    action4: "CharacterArmature|Sword_Slash",
+    action1: "CharacterArmature|Gun_Shoot",
+    action2: "CharacterArmature|Punch_Left",
+    action3: "CharacterArmature|Death",
+    action4: "CharacterArmature|HitRecieve",
   };
 
   return (

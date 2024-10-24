@@ -8,7 +8,9 @@ export const GameProvider = ({ children }) => {
   const playerRef = useRef();
   const zombiesRef = useRef([]); // Referencias a todos los zombies
   const [playerPosition, setPlayerPosition] = useState([0, 0, 0]);
-  const [zombies, setZombies] = useState([]);
+  const [playerHealth, setPlayerHealth] = useState(100);
+  const [hitReceived, setHitReceived] = useState(false);
+  const [isDead, setIsDead] = useState(false);
 
   return (
     <GameContext.Provider
@@ -17,8 +19,14 @@ export const GameProvider = ({ children }) => {
         playerPosition,
         setPlayerPosition,
         zombiesRef,
-        zombies,
-        setZombies,
+        // zombies,
+        // setZombies,
+        playerHealth,
+        setPlayerHealth,
+        hitReceived,
+        setHitReceived,
+        isDead,
+        setIsDead,
       }}
     >
       {children}
