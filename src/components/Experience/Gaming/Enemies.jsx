@@ -1,23 +1,30 @@
-//funcion para generar posicion aleatoria en ele eje x y z
+// Enemies.js
+import React, { useState, useCallback } from "react";
+import { Zombie } from "../Characters/Zombie2";
 
-import { Zombie } from "../Characters";
-
-const randomPosition = () => {
-  return Math.floor(Math.random() * 50) * (Math.random() > 0.5 ? 1 : -1);
-};
-
-const enemies = Array(20)
-  .fill()
-  .map(() => ({
-    position: [randomPosition(), 30, randomPosition()],
-    // health: 100,
-  }));
-
-console.log(enemies);
+const randomPosition = () =>
+  Math.floor(Math.random() * 20) * (Math.random() > 0.5 ? 1 : -1);
 
 export const Enemies = () => {
-  return enemies.map((enemy, i) => (
-    <Zombie key={i} position={enemy.position} scale={0.5} />
-  ));
-  // return <Zombie position={[10, 30, 10]} scale={0.5} />;
+  const [zombieKey, setZombieKey] = useState(0);
+  const [position, setPosition] = useState([
+    randomPosition(),
+    30,
+    randomPosition(),
+  ]);
+
+  const respawnZombie = useCallback(() => {
+    setPosition([randomPosition(), 30, randomPosition()]);
+    setZombieKey((prevKey) => prevKey + 1); // Cambiamos el `key` para recrear el zombie
+    console.log(position);
+  }, []);
+
+  return (
+    <Zombie
+      key={zombieKey}
+      position={position}
+      scale={0.5}
+      onDeath={respawnZombie} // Pasamos `respawnZombie` para invocar al morir
+    />
+  );
 };

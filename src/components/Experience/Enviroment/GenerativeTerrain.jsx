@@ -15,11 +15,11 @@ function createSolidTexture(color) {
   return new THREE.CanvasTexture(canvas);
 }
 
-export function GenerativeTerrain() {
+export function GenerativeTerrain({ onTerrainLoaded }) {
   const models = [
     {
       model: useLoader(GLTFLoader, "/models/nature/Pine.glb").scene,
-      spread: 0.01,
+      spread: 0.005,
     },
     {
       model: useLoader(GLTFLoader, "/models/nature/Pine 2.glb").scene,
@@ -30,23 +30,23 @@ export function GenerativeTerrain() {
   const modelsWithoutPhysics = [
     {
       model: useLoader(GLTFLoader, "/models/nature/Pebble Round.glb").scene,
-      spread: 0.01,
+      spread: 0.005,
     },
     {
       model: useLoader(GLTFLoader, "/models/nature/Fern.glb").scene,
-      spread: 0.01,
+      spread: 0.005,
     },
     {
       model: useLoader(GLTFLoader, "/models/nature/Clover.glb").scene,
-      spread: 0.01,
+      spread: 0.005,
     },
     {
       model: useLoader(GLTFLoader, "/models/nature/Plant.glb").scene,
-      spread: 0.01,
+      spread: 0.005,
     },
     {
       model: useLoader(GLTFLoader, "/models/nature/Mushroom.glb").scene,
-      spread: 0.01,
+      spread: 0.005,
     },
   ];
 
@@ -106,7 +106,7 @@ export function GenerativeTerrain() {
       value: "EaseInWeak",
     },
     size: {
-      value: 150,
+      value: 64,
       min: 64,
       max: 512,
       step: 64,
@@ -118,13 +118,13 @@ export function GenerativeTerrain() {
       step: 8,
     },
     maxHeight: {
-      value: 27,
+      value: 12,
       min: 5,
       max: 120,
       step: 5,
     },
     minHeight: {
-      value: -10,
+      value: -2,
       min: -50,
       max: 0,
       step: 5,
@@ -221,6 +221,8 @@ export function GenerativeTerrain() {
 
     setDecoSceneWithoutPhysics(scatterSceneWithoutPhysics);
 
+    onTerrainLoaded();
+
     return () => {
       if (terrainRef.current) terrainRef.current.remove(terrain.scene);
     };
@@ -248,7 +250,7 @@ export function GenerativeTerrain() {
   });
 
   return (
-    <group position={[0, -24, 0]} ref={terrainRef}>
+    <group position={[0, -12, 0]} ref={terrainRef}>
       {/* Renderizar el terreno */}
       {terrainScene && (
         <RigidBody type="fixed" colliders="trimesh">
@@ -272,7 +274,6 @@ export function GenerativeTerrain() {
       {decoSceneWithoutPhysics && (
         <primitive object={decoSceneWithoutPhysics} />
       )}
-
     </group>
   );
 }

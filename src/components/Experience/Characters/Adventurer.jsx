@@ -97,7 +97,6 @@ export function Adventurer(props) {
 
   useFrame(() => {
     if (!group.current) return;
-    console.log(hitReceived);
 
     const worldPosition = group.current.getWorldPosition(new THREE.Vector3());
     setPlayerPosition([worldPosition.x, worldPosition.y, worldPosition.z]);
@@ -113,7 +112,7 @@ export function Adventurer(props) {
   };
 
   useEffect(() => {
-    console.log(playerHealth);
+    // console.log(playerHealth);
 
     if (playerHealth <= 0) {
       controller.action3();

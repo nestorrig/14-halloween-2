@@ -56,7 +56,7 @@ export const Ambient = () => {
   return (
     <>
       <color attach="background" args={["#0d0d0d"]} />
-      {/* <fog attach="fog" args={["#0d0d0d", 0, 16]} /> */}
+      <fog attach="fog" args={["#0d0d0d", 0, 16]} />
       <ambientLight intensity={light.ambientLightIntensity} />
       <directionalLight
         ref={lightRef}

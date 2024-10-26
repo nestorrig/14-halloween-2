@@ -1,102 +1,92 @@
-import React, { useEffect, useState, useRef, useMemo, act } from "react";
-import { useFrame, useGraph } from "@react-three/fiber";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
-import { RigidBody, CapsuleCollider } from "@react-three/rapier";
+import { useGameContext } from "../context/GameContext";
 import * as THREE from "three";
-import { useGameContext } from "../../../context/GameContext";
 import { useGame } from "ecctrl";
+import { useGraph, useThree } from "@react-three/fiber";
 
 const capsuleRadius = 0.8;
 const capsuleHalfHeight = 0.8;
 const attackDistance = 1;
 const detectDistance = 8;
 
-export function Zombie(props) {
+export function useZombie(onDeath) {
   const group = useRef();
   const { scene, animations } = useGLTF("/models/characters/Zombie_2.glb");
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
   const { nodes, materials } = useGraph(clone);
   const { actions, mixer } = useAnimations(animations, group);
+  const { scene: threeScene } = useThree();
 
-  const { playerPosition, setPlayerHealth, setHitReceived } = useGameContext(); // Obtener la posición del jugador
-  const [zombieState, setZombieState] = useState("patrolling"); // Estados: "patrolling", "attacking", "growling", "dying"
-  const [animation, setAnimation] = useState("Armature|Walk"); // Animación actual
-  const [health, setHealth] = useState(100); // Salud del zombie
-  const [zombieHitReceived, setZombieHitReceived] = useState(0); // Daño recibido
-  const [direction, setDirection] = useState(new THREE.Vector3()); // Dirección del movimiento
-  const [zombieIsDead, setZombieIsDead] = useState(false); // Estado de muerte
+  const { playerPosition, setPlayerHealth, setHitReceived } = useGameContext();
+  const [zombieState, setZombieState] = useState("patrolling");
+  const [animation, setAnimation] = useState("Armature|Walk");
+  const [health, setHealth] = useState(100);
+  const [zombieHitReceived, setZombieHitReceived] = useState(0);
+  const [direction, setDirection] = useState(new THREE.Vector3());
+  const [zombieIsDead, setZombieIsDead] = useState(false);
   const growlTimeout = useRef(null);
   const patrolTimeout = useRef(null);
   const controller = useGame();
-
-  // Variable local para la velocidad
   let speed = 0.03;
-  const randomGrowlLapse = () => {
-    return Math.random() * (20 - 10) + 10;
-  };
 
   const handleDeath = () => {
     changeAnimation("Armature|Die");
     setZombieIsDead(true);
-
-    // Detener el mixer en el último frame de la animación
-    actions["Armature|Die"].clampWhenFinished = true; // Mantener el último frame
-    actions["Armature|Die"].setLoop(THREE.LoopOnce); // Reproducir solo una vez
+    actions["Armature|Die"].clampWhenFinished = true;
+    actions["Armature|Die"].setLoop(THREE.LoopOnce);
     actions["Armature|Die"].play();
 
     mixer.addEventListener("finished", () => {
       console.log("Zombie died");
+      onDeath();
+      threeScene.remove(group.current);
     });
   };
 
-  // Función para cambiar animaciones con control de estado
   const changeAnimation = (newAnimation) => {
     if (animation !== newAnimation && actions[newAnimation]) {
-      actions[animation]?.fadeOut(0.5); // Asegúrate de que la animación anterior termine
+      actions[animation]?.fadeOut(0.5);
       actions[newAnimation].reset().fadeIn(0.5).play();
-      setAnimation(newAnimation); // Actualiza el estado de animación
+      setAnimation(newAnimation);
     }
   };
 
-  // Movimiento aleatorio en X y Z
   const randomDirection = () => {
     const angle = Math.random() * Math.PI * 2;
     return new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle)).normalize();
   };
 
-  // Patrullar aleatoriamente
   const patrol = () => {
     group.current.position.add(direction.clone().multiplyScalar(speed));
     const targetDirection = direction.clone().setY(0).normalize();
     const angle = Math.atan2(targetDirection.x, targetDirection.z);
-    group.current.rotation.set(0, angle, 0); // Solo rotación en el eje Y
+    group.current.rotation.set(0, angle, 0);
   };
 
-  // Perseguir al jugador
   const chasePlayer = (playerPos, zombiePosition) => {
     const directionToPlayer = new THREE.Vector3()
       .subVectors(playerPos, zombiePosition)
       .normalize();
 
-    // Verificar la distancia para evitar curvas innecesarias
     if (directionToPlayer.length() > 0.01) {
       group.current.position.add(directionToPlayer.multiplyScalar(speed));
-      group.current.lookAt(playerPos); // Mirar hacia el jugador
+      group.current.lookAt(playerPos);
     }
   };
+
   const scheduleGrowl = () => {
-    const interval = Math.random() * (20 - 10) * 1000 + 10000; // Entre 10 y 20 segundos
+    const interval = Math.random() * (20 - 10) * 1000 + 10000;
     growlTimeout.current = setTimeout(() => {
       if (zombieState === "patrolling") {
         setZombieState("growling");
         changeAnimation("Armature|Scream");
 
-        // Regresar a patrullaje después de gruñir
         setTimeout(() => {
           setZombieState("patrolling");
           changeAnimation("Armature|Walk");
-          scheduleGrowl(); // Reprogramar gruñido
+          scheduleGrowl();
         }, 2000);
       }
     }, interval);
@@ -104,17 +94,22 @@ export function Zombie(props) {
 
   const schedulePatrol = () => {
     if (zombieIsDead) return;
-    const interval = Math.random() * (10 - 4) * 1000 + 4000; // Entre 10 y 20 segundos
+    const interval = Math.random() * (10 - 4) * 1000 + 4000;
     patrolTimeout.current = setTimeout(() => {
       if (zombieState === "patrolling") {
         setDirection(randomDirection());
-        schedulePatrol(); // Reprogramar patrullaje
+        schedulePatrol();
       }
     }, interval);
   };
 
-  // Manejo de gruñidos y cambio de dirección en patrullaje
   useEffect(() => {
+    if (zombieIsDead) {
+      clearTimeout(growlTimeout.current);
+      clearTimeout(patrolTimeout.current);
+      return;
+    }
+
     scheduleGrowl();
     schedulePatrol();
 
@@ -129,7 +124,7 @@ export function Zombie(props) {
     setZombieHitReceived(0);
   };
 
-  const changeEmmisive = (color) => {
+  const changeEmissive = (color) => {
     for (const key in materials) {
       if (Object.prototype.hasOwnProperty.call(materials, key)) {
         const element = materials[key];
@@ -140,8 +135,8 @@ export function Zombie(props) {
 
   useEffect(() => {
     if (zombieHitReceived === 0) return;
-    changeEmmisive(0xff0000); // Cambiar color al recibir daño
-    setTimeout(() => changeEmmisive(0x000000), 300); // Restaurar color
+    changeEmissive(0xff0000);
+    setTimeout(() => changeEmissive(0x000000), 300);
     if (zombieHitReceived === 1) {
       receiveDamage(50);
     } else if (zombieHitReceived === 2) {
@@ -149,19 +144,17 @@ export function Zombie(props) {
     }
   }, [zombieHitReceived]);
 
-  // Lógica de estados y animaciones por frame
-  useFrame(() => {
-    if (!group.current) return;
-    if (zombieIsDead) return;
+  const updateZombie = () => {
+    if (!group.current || zombieIsDead) return;
 
     const zombiePosition = group.current.getWorldPosition(new THREE.Vector3());
     const playerPos = new THREE.Vector3(...playerPosition);
     const distanceToPlayer = zombiePosition.distanceTo(playerPos);
-    console.log(distanceToPlayer);
+    // console.log(distanceToPlayer);
 
     switch (zombieState) {
       case "growling":
-        if (distanceToPlayer < detectDistance) return; // No gruñir si el jugador está cerca
+        if (distanceToPlayer < detectDistance) return;
         setTimeout(() => {
           setZombieState("patrolling");
           changeAnimation("Armature|Walk");
@@ -180,11 +173,11 @@ export function Zombie(props) {
         if (distanceToPlayer < detectDistance) {
           setZombieState("attacking");
           changeAnimation("Armature|Running_Crawl");
-          speed = 0.2; // Aumentar la velocidad durante la persecución
+          speed = 0.2;
           chasePlayer(playerPos, zombiePosition);
         } else {
           changeAnimation("Armature|Walk");
-          speed = 0.03; // Velocidad estándar de patrullaje
+          speed = 0.03;
           patrol();
         }
         break;
@@ -198,12 +191,9 @@ export function Zombie(props) {
     }
 
     if (distanceToPlayer < attackDistance) {
-      console.log("close to player");
-
       if (animation === "Armature|Attack") {
         if (actions[animation].time > 0.9 && actions[animation].time < 1.2) {
-          console.log("Attacking player");
-          setPlayerHealth((prevHealth) => prevHealth - 1); // Dañar al jugador
+          setPlayerHealth((prevHealth) => prevHealth - 1);
           setHitReceived(true);
           setTimeout(() => setHitReceived(false), 1000);
         }
@@ -215,57 +205,21 @@ export function Zombie(props) {
       if (controller.curAnimation === "CharacterArmature|Gun_Shoot") {
         setZombieHitReceived(1);
       }
-      console.log(health);
     }
 
-    // Muerte del zombie
     if (health <= 0 && zombieState !== "dying") {
       setZombieState("dying");
     }
-  });
+  };
 
-  return (
-    <RigidBody
-      colliders={false}
-      type="dynamic"
-      lockRotations={[true, false, true]} // Bloquear rotaciones para mayor estabilidad
-      enabledRotations={[false, true, false]}
-      linearDamping={0.5} // Para suavizar el movimiento
-      angularDamping={1.0} // Reducir las rotaciones no deseadas
-      friction={5} // Fricción para evitar deslizamientos
-      {...props}
-    >
-      {!zombieIsDead && (
-        <CapsuleCollider
-          name="zombie-capsule-collider"
-          args={[capsuleHalfHeight, capsuleRadius]}
-          position={[
-            group.current?.position.x || 0,
-            group.current?.position.y + capsuleHalfHeight * 2 || 0,
-            group.current?.position.z || 0,
-          ]}
-        />
-      )}
-
-      <group ref={group} {...props} dispose={null} scale={[0.7, 0.7, 0.7]}>
-        <group name="Root_Scene">
-          <group name="RootNode">
-            <group name="Armature">
-              <primitive object={nodes.mixamorigHips} />
-            </group>
-            <skinnedMesh
-              castShadow
-              receiveShadow
-              name="Character"
-              geometry={nodes.Character.geometry}
-              material={materials.ColorSwatch}
-              skeleton={nodes.Character.skeleton}
-            />
-          </group>
-        </group>
-      </group>
-    </RigidBody>
-  );
+  return {
+    group,
+    zombieState,
+    zombieIsDead,
+    nodes,
+    materials,
+    updateZombie,
+    capsuleRadius,
+    capsuleHalfHeight,
+  };
 }
-
-useGLTF.preload("/models/characters/Zombie_2.glb");
