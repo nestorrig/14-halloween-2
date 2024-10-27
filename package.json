@@ -14,8 +14,10 @@
     "@react-three/fiber": "^8.17.10",
     "@react-three/rapier": "^1.5.0",
     "ecctrl": "^1.0.90",
+    "gsap": "^3.12.5",
     "leva": "^0.9.35",
     "react": "^18.3.1",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^18.3.1",
     "three": "^0.169.0",
     "three.terrain.js": "^2.0.0"

@@ -11,6 +11,7 @@ export const GameProvider = ({ children }) => {
   const [playerHealth, setPlayerHealth] = useState(100);
   const [hitReceived, setHitReceived] = useState(false);
   const [isDead, setIsDead] = useState(false);
+  const [cameraAnimation, setCameraAnimation] = useState(0);
 
   return (
     <GameContext.Provider
@@ -25,6 +26,8 @@ export const GameProvider = ({ children }) => {
         setHitReceived,
         isDead,
         setIsDead,
+        cameraAnimation,
+        setCameraAnimation,
       }}
     >
       {children}

@@ -8,6 +8,9 @@ import { Ambient } from "./Enviroment";
 import { useControls } from "leva";
 import * as THREE from "three";
 import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { useGameContext } from "../../context/GameContext";
+import { isMobile } from "react-device-detect";
 
 export const Lobby = () => {
   const Pine = useGLTF("/models/nature/Pine.glb");
@@ -29,6 +32,55 @@ export const Lobby = () => {
     animationsFem,
     groupFem
   );
+
+  const cameraRef = useRef();
+  const controlsRef = useRef();
+
+  const { cameraAnimation } = useGameContext();
+
+  useEffect(() => {
+    if (!cameraRef.current) return;
+
+    if (cameraAnimation === 1) {
+      gsap.to(cameraRef.current.position, {
+        duration: 5,
+        x: 0,
+        y: 1.2,
+        z: isMobile ? 9 : 7,
+        ease: "power3.inOut",
+      });
+      gsap.to(controlsRef.current.target, {
+        duration: 5,
+        x: 0,
+        y: 1.2,
+        z: 0,
+        ease: "power3.inOut",
+      });
+      return;
+    }
+
+    if (cameraAnimation === 2 || cameraAnimation === 3) {
+      let x;
+      if (cameraAnimation === 2) {
+        x = isMobile ? -0.5 : -1;
+      } else {
+        x = isMobile ? 0.5 : 1;
+      }
+
+      gsap.to(cameraRef.current.position, {
+        duration: 3,
+        x: x,
+        y: 1.5,
+        z: isMobile ? 6 : 5.8,
+        ease: "power3.inOut",
+      });
+      gsap.to(controlsRef.current.target, {
+        duration: 3,
+        y: 1.5,
+        ease: "power3.inOut",
+      });
+    }
+  }, [cameraAnimation]);
 
   useEffect(() => {
     actions["CharacterArmature|Idle"].reset().fadeIn(0.5).play();
@@ -68,8 +120,14 @@ export const Lobby = () => {
       {/* 28, 9, -3 */}
       {/* 28, 15, 7 */}
       <Ambient sunPosition={[28, 15, 7]} />
-      <PerspectiveCamera position={[0, 2, 10]} makeDefault />
-      <OrbitControls />
+      {/* position 1: 2,8,5 */}
+
+      <PerspectiveCamera position={[2, 8, 5]} makeDefault ref={cameraRef} />
+
+      {/* target 1: 0, 8, 0 */}
+      <OrbitControls target={[0, 8, 0]} ref={controlsRef} />
+
+      {/* Suelo de la escena */}
       <group>
         <mesh
           receiveShadow
