@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 import { useGameContext } from "../context/GameContext";
@@ -20,20 +20,33 @@ export function useZombie(onDeath) {
   const { scene: threeScene } = useThree();
 
   const { playerPosition, setPlayerHealth, setHitReceived } = useGameContext();
-  const [zombieState, setZombieState] = useState("patrolling");
-  const [animation, setAnimation] = useState("Armature|Walk");
-  const [health, setHealth] = useState(100);
-  const [zombieHitReceived, setZombieHitReceived] = useState(0);
-  const [direction, setDirection] = useState(new THREE.Vector3());
-  const [zombieIsDead, setZombieIsDead] = useState(false);
+
+  // Replace state with refs
+  const zombieState = useRef("patrolling");
+  const animation = useRef("Armature|Walk");
+  const health = useRef(100);
+  const zombieHitReceived = useRef(0);
+  const direction = useRef(new THREE.Vector3());
+  const zombieIsDead = useRef(false);
+
   const growlTimeout = useRef(null);
   const patrolTimeout = useRef(null);
+  const lastDamageTime = useRef(0);
+  const lastHitTime = useRef(0);
   const controller = useGame();
   let speed = 0.03;
 
+  const changeAnimation = (newAnimation) => {
+    if (animation.current !== newAnimation && actions[newAnimation]) {
+      actions[animation.current]?.fadeOut(0.5);
+      actions[newAnimation].reset().fadeIn(0.5).play();
+      animation.current = newAnimation;
+    }
+  };
+
   const handleDeath = () => {
     changeAnimation("Armature|Die");
-    setZombieIsDead(true);
+    zombieIsDead.current = true;
     actions["Armature|Die"].clampWhenFinished = true;
     actions["Armature|Die"].setLoop(THREE.LoopOnce);
     actions["Armature|Die"].play();
@@ -45,22 +58,14 @@ export function useZombie(onDeath) {
     });
   };
 
-  const changeAnimation = (newAnimation) => {
-    if (animation !== newAnimation && actions[newAnimation]) {
-      actions[animation]?.fadeOut(0.5);
-      actions[newAnimation].reset().fadeIn(0.5).play();
-      setAnimation(newAnimation);
-    }
-  };
-
   const randomDirection = () => {
     const angle = Math.random() * Math.PI * 2;
     return new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle)).normalize();
   };
 
   const patrol = () => {
-    group.current.position.add(direction.clone().multiplyScalar(speed));
-    const targetDirection = direction.clone().setY(0).normalize();
+    group.current.position.add(direction.current.clone().multiplyScalar(speed));
+    const targetDirection = direction.current.clone().setY(0).normalize();
     const angle = Math.atan2(targetDirection.x, targetDirection.z);
     group.current.rotation.set(0, angle, 0);
   };
@@ -79,12 +84,12 @@ export function useZombie(onDeath) {
   const scheduleGrowl = () => {
     const interval = Math.random() * (20 - 10) * 1000 + 10000;
     growlTimeout.current = setTimeout(() => {
-      if (zombieState === "patrolling") {
-        setZombieState("growling");
+      if (zombieState.current === "patrolling") {
+        zombieState.current = "growling";
         changeAnimation("Armature|Scream");
 
         setTimeout(() => {
-          setZombieState("patrolling");
+          zombieState.current = "patrolling";
           changeAnimation("Armature|Walk");
           scheduleGrowl();
         }, 2000);
@@ -93,18 +98,18 @@ export function useZombie(onDeath) {
   };
 
   const schedulePatrol = () => {
-    if (zombieIsDead) return;
+    if (zombieIsDead.current) return;
     const interval = Math.random() * (10 - 4) * 1000 + 4000;
     patrolTimeout.current = setTimeout(() => {
-      if (zombieState === "patrolling") {
-        setDirection(randomDirection());
+      if (zombieState.current === "patrolling") {
+        direction.current = randomDirection();
         schedulePatrol();
       }
     }, interval);
   };
 
   useEffect(() => {
-    if (zombieIsDead) {
+    if (zombieIsDead.current) {
       clearTimeout(growlTimeout.current);
       clearTimeout(patrolTimeout.current);
       return;
@@ -117,53 +122,53 @@ export function useZombie(onDeath) {
       clearTimeout(growlTimeout.current);
       clearTimeout(patrolTimeout.current);
     };
-  }, [zombieState]);
+  }, []);
 
   const receiveDamage = (damage) => {
-    setHealth((prevHealth) => Math.max(0, prevHealth - damage));
-    setZombieHitReceived(0);
+    health.current = Math.max(0, health.current - damage);
+    zombieHitReceived.current = 0;
   };
 
   const changeEmissive = (color) => {
-    for (const key in materials) {
-      if (Object.prototype.hasOwnProperty.call(materials, key)) {
-        const element = materials[key];
-        element.emissive = new THREE.Color(color);
-      }
-    }
+    Object.values(materials).forEach((material) => {
+      material.emissive = new THREE.Color(color);
+    });
   };
 
   useEffect(() => {
-    if (zombieHitReceived === 0) return;
+    console.log("damage received");
+
+    if (zombieHitReceived.current === 0) return;
     changeEmissive(0xff0000);
     setTimeout(() => changeEmissive(0x000000), 300);
-    if (zombieHitReceived === 1) {
+    if (zombieHitReceived.current === 1) {
       receiveDamage(50);
-    } else if (zombieHitReceived === 2) {
+    } else if (zombieHitReceived.current === 2) {
       receiveDamage(35);
     }
-  }, [zombieHitReceived]);
+  }, [lastDamageTime.current]);
 
   const updateZombie = () => {
-    if (!group.current || zombieIsDead) return;
+    if (!group.current || zombieIsDead.current) return;
 
     const zombiePosition = group.current.getWorldPosition(new THREE.Vector3());
     const playerPos = new THREE.Vector3(...playerPosition);
     const distanceToPlayer = zombiePosition.distanceTo(playerPos);
-    // console.log(distanceToPlayer);
 
-    switch (zombieState) {
+    console.log(distanceToPlayer);
+
+    switch (zombieState.current) {
       case "growling":
         if (distanceToPlayer < detectDistance) return;
         setTimeout(() => {
-          setZombieState("patrolling");
+          zombieState.current = "patrolling";
           changeAnimation("Armature|Walk");
         }, 1000);
         break;
 
       case "attacking":
         if (distanceToPlayer > attackDistance) {
-          setZombieState("patrolling");
+          zombieState.current = "patrolling";
         } else {
           changeAnimation("Armature|Attack");
         }
@@ -171,7 +176,7 @@ export function useZombie(onDeath) {
 
       case "patrolling":
         if (distanceToPlayer < detectDistance) {
-          setZombieState("attacking");
+          zombieState.current = "attacking";
           changeAnimation("Armature|Running_Crawl");
           speed = 0.2;
           chasePlayer(playerPos, zombiePosition);
@@ -191,31 +196,51 @@ export function useZombie(onDeath) {
     }
 
     if (distanceToPlayer < attackDistance) {
-      if (animation === "Armature|Attack") {
-        if (actions[animation].time > 0.9 && actions[animation].time < 1.2) {
-          setPlayerHealth((prevHealth) => prevHealth - 1);
-          setHitReceived(true);
-          setTimeout(() => setHitReceived(false), 1000);
-        }
+      const now = performance.now();
+      if (
+        animation.current === "Armature|Attack" &&
+        now - lastHitTime.current > 1500
+      ) {
+        setPlayerHealth((prev) => prev - 1);
+        setHitReceived(true);
+        lastHitTime.current = now;
+        setTimeout(() => setHitReceived(false), 1000);
       }
 
-      if (controller.curAnimation === "CharacterArmature|Punch_Left") {
-        setZombieHitReceived(2);
+      if (
+        controller.curAnimation === "CharacterArmature|Punch_Left" &&
+        now - lastDamageTime.current > 500
+      ) {
+        zombieHitReceived.current = 2;
+        // changeEmissive(0xff0000); // Indicador visual de daño
+        // receiveDamage(35);
+        lastDamageTime.current = now;
+        // setTimeout(() => changeEmissive(0x000000), 300); // Reinicia el color después de 300 ms
       }
-      if (controller.curAnimation === "CharacterArmature|Gun_Shoot") {
-        setZombieHitReceived(1);
+
+      if (
+        controller.curAnimation === "CharacterArmature|Gun_Shoot" &&
+        now - lastDamageTime.current > 500
+      ) {
+        zombieHitReceived.current = 1;
+        // changeEmissive(0xff0000);
+        // receiveDamage(50);
+        lastDamageTime.current = now;
+        // setTimeout(() => changeEmissive(0x000000), 300);
       }
     }
 
-    if (health <= 0 && zombieState !== "dying") {
-      setZombieState("dying");
+    if (health.current <= 0 && zombieState.current !== "dying") {
+      zombieState.current = "dying";
     }
+
+    if (distanceToPlayer > 300) handleDeath();
   };
 
   return {
     group,
-    zombieState,
-    zombieIsDead,
+    zombieState: zombieState.current,
+    zombieIsDead: zombieIsDead.current,
     nodes,
     materials,
     updateZombie,

@@ -4,6 +4,11 @@ import { RigidBody, CapsuleCollider } from "@react-three/rapier";
 import { useZombie } from "../../../hooks/useZombie";
 
 export function Zombie({ position, scale, onDeath }) {
+  useEffect(() => {
+    console.log("Zombie mounted");
+  }, []);
+
+
   const {
     group,
     zombieIsDead,

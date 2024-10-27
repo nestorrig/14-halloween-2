@@ -20,7 +20,7 @@ export const Experience = () => {
         <Ambient />
         <OrbitControls />
         <Suspense fallback={null}>
-          <Physics gravity={[0, -9.8, 0]} debug>
+          <Physics gravity={[0, -9.8, 0]}>
             <GenerativeTerrain onTerrainLoaded={handleTerrainLoaded} />
             <PerimeterWall />
             {/* Solo mostrar los enemigos y el jugador si el terreno está listo */}
