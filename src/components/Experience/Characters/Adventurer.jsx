@@ -8,7 +8,6 @@ import { useFrame, useGraph } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 import { useControls } from "leva";
-import { useGameLogic } from "../../../hooks/useGameLogic";
 import * as THREE from "three";
 import { useGameContext } from "../../../context/GameContext";
 import { useGame } from "ecctrl";
@@ -19,14 +18,8 @@ export function Adventurer(props) {
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
   const { nodes, materials } = useGraph(clone);
   const { actions } = useAnimations(animations, group);
-
-  // const { scene: gunScene } = useGLTF("/models/weapons/Revolver.glb"); // Cargar arma
   const { scene: gunScene } = useGLTF("/models/weapons/Pistol.glb"); // Cargar arma
-  // const { scene: gunScene } = useGLTF("/models/weapons/Bayonet.glb"); // Cargar arma
-
   const { position } = nodes.WristR; // Posición del hueso de la muñeca derecha
-
-  const gameLogic = useGameLogic({ playerRef: group });
   const controller = useGame();
 
   useControls("Adventurer", {
@@ -297,5 +290,3 @@ export function Adventurer(props) {
 
 useGLTF.preload("/models/characters/Adventurer.glb");
 useGLTF.preload("/models/weapons/Pistol.glb");
-useGLTF.preload("/models/weapons/Revolver.glb");
-useGLTF.preload("/models/weapons/Bayonet.glb");

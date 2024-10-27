@@ -1,7 +1,10 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useControls } from "leva";
+// import { useThree } from "@react-three/fiber";
+// import { useHelper } from "@react-three/drei";
+// import * as THREE from "three";
 
-export const Ambient = () => {
+export const Ambient = ({ sunPosition = [0, 25, -35] }) => {
   const light = useControls("Sun Position", {
     directionalLightIntensity: {
       value: 1.5,
@@ -16,13 +19,13 @@ export const Ambient = () => {
       name: "Sun X",
     },
     directionalLightY: {
-      value: 75,
+      value: 25,
       min: -75,
       max: 75,
       name: "Sun Y",
     },
     directionalLightZ: {
-      value: -75,
+      value: -35,
       min: -75,
       max: 75,
       name: "Sun Z",
@@ -60,20 +63,21 @@ export const Ambient = () => {
       <ambientLight intensity={light.ambientLightIntensity} />
       <directionalLight
         ref={lightRef}
-        position={[
-          light.directionalLightX,
-          light.directionalLightY,
-          light.directionalLightZ,
-        ]}
+        position={sunPosition}
         intensity={light.directionalLightIntensity}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={200}
-        shadow-camera-left={-75}
-        shadow-camera-right={75}
-        shadow-camera-top={75}
-        shadow-camera-bottom={-75}
+        shadow-mapSize-width={4096}
+        shadow-mapSize-height={4096}
+        shadow-camera-far={80}
+        shadow-camera-left={-36}
+        shadow-camera-right={36}
+        shadow-camera-top={36}
+        shadow-camera-bottom={-36}
+        // position={[
+        //   light.directionalLightX,
+        //   light.directionalLightY,
+        //   light.directionalLightZ,
+        // ]}
       />
     </>
   );
