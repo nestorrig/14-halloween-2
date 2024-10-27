@@ -1,7 +1,7 @@
 import { KeyboardControls } from "@react-three/drei";
 import Ecctrl, { EcctrlAnimation } from "ecctrl";
-import { Adventurer } from "../Characters";
-import { AdventurerModel } from "../../../assets/models";
+import { Adventurer, AdventurerFem } from "../Characters";
+import { AdventurerModel, AdventurerFemModel } from "../../../assets/models";
 
 export const Controller = () => {
   const keyboardMap = [
@@ -56,10 +56,12 @@ export const Controller = () => {
       >
         <EcctrlAnimation
           animationSet={animationSet}
-          characterURL={AdventurerModel}
+          // characterURL={AdventurerModel}
+          characterURL={AdventurerFemModel}
         >
           <group position={[0, -1, 0]} visible={true}>
-            <Adventurer />
+            {/* <Adventurer /> */}
+            <AdventurerFem />
           </group>
         </EcctrlAnimation>
       </Ecctrl>

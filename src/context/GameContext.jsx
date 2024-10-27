@@ -19,8 +19,6 @@ export const GameProvider = ({ children }) => {
         playerPosition,
         setPlayerPosition,
         zombiesRef,
-        // zombies,
-        // setZombies,
         playerHealth,
         setPlayerHealth,
         hitReceived,

@@ -234,7 +234,7 @@ export function useZombie(onDeath) {
       zombieState.current = "dying";
     }
 
-    if (distanceToPlayer > 300) handleDeath();
+    if (distanceToPlayer > 100) handleDeath();
   };
 
   return {
