@@ -12,6 +12,7 @@ export const GameProvider = ({ children }) => {
   const [hitReceived, setHitReceived] = useState(false);
   const [isDead, setIsDead] = useState(false);
   const [cameraAnimation, setCameraAnimation] = useState(0);
+  const [initUiLobby, setInitUILobby] = useState(false);
 
   return (
     <GameContext.Provider
@@ -28,6 +29,8 @@ export const GameProvider = ({ children }) => {
         setIsDead,
         cameraAnimation,
         setCameraAnimation,
+        initUiLobby,
+        setInitUILobby,
       }}
     >
       {children}

@@ -7,10 +7,11 @@ import {
 import { Ambient } from "./Enviroment";
 import { useControls } from "leva";
 import * as THREE from "three";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useGameContext } from "../../context/GameContext";
 import { isMobile } from "react-device-detect";
+import { Loader } from "../UI/Loader";
 
 export const Lobby = () => {
   const Pine = useGLTF("/models/nature/Pine.glb");
@@ -138,7 +139,6 @@ export const Lobby = () => {
           <meshStandardMaterial color="#1a4519" side={THREE.DoubleSide} />
         </mesh>
       </group>
-
       {/* Vegetación en la escena */}
       <group rotation={[0, 0, 0]} position={[0, 0, 0]}>
         {/* Pine */}
