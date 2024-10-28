@@ -58,15 +58,14 @@ export const Welcome = () => {
 
   useEffect(() => {
     if (removeWelcome) {
-      timeline.current.duration(6);
-      timeline.current.reverse();
-      timeline.current.eventCallback("onUpdate", () => {
-        if (timeline.current.progress() < 0.6) {
-          setCameraAnimation(1);
-        }
-      });
-      timeline.current.eventCallback("onReverseComplete", () => {
-        gsap.set(".enter-container", { display: "none" });
+      setCameraAnimation(1);
+      gsap.to(".enter-container", {
+        duration: 1,
+        opacity: 0,
+        ease: "power3.inOut",
+        onComplete: () => {
+          gsap.set(".enter-container", { display: "none" });
+        },
       });
     }
   }, [removeWelcome]);
@@ -90,19 +89,19 @@ export const Welcome = () => {
     <div className="enter-container absolute top-0 left-0 p-4 py-16 lg:p-16 w-full max-w-3xl z-40">
       <div className="overflow-hidden">
         <h1
-          className="text-white text-6xl lg:text-9xl font-Jolly-Lodger title"
+          className="text-[#E2DFD0] text-6xl lg:text-9xl font-Jolly-Lodger title"
           style={{ fontKerning: "none" }}
         >
           Echoes in the Fog
         </h1>
       </div>
       <div className="overflow-hidden mt-4 lg:mt-6">
-        <h2 className="text-white text-3xl font-Kanit font-thin italic origin-left   subtitle">
+        <h2 className="text-[#E2DFD0] text-3xl font-Kanit font-thin italic origin-left   subtitle">
           A 3D Adventure Game
         </h2>
       </div>
       <div className="overflow-hidden mt-1 lg:mt-2">
-        <p className="text-white font-Kanit font-light italic parraf">
+        <p className="text-[#E2DFD0] font-Kanit font-light italic parraf">
           Deep within a fog-drenched forest, something stirs. The dead walk
           again, haunting the misty trails, waiting to claim any who dare enter.
           As one of the last survivors, you step into this cursed wood, choosing

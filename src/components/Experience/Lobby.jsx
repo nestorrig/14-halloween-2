@@ -37,7 +37,7 @@ export const Lobby = () => {
   const cameraRef = useRef();
   const controlsRef = useRef();
 
-  const { cameraAnimation } = useGameContext();
+  const { cameraAnimation, setInitSelectPlayer } = useGameContext();
 
   useEffect(() => {
     if (!cameraRef.current) return;
@@ -56,6 +56,9 @@ export const Lobby = () => {
         y: 1.2,
         z: 0,
         ease: "power3.inOut",
+        onComplete: () => {
+          setInitSelectPlayer(true);
+        },
       });
       return;
     }
