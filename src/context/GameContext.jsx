@@ -14,6 +14,8 @@ export const GameProvider = ({ children }) => {
   const [cameraAnimation, setCameraAnimation] = useState(0);
   const [initUILobby, setInitUILobby] = useState(false);
   const [initSelectPlayer, setInitSelectPlayer] = useState(false);
+  const [isLobby, setIsLobby] = useState(true);
+  const [isMale, setIsMale] = useState(null);
 
   return (
     <GameContext.Provider
@@ -34,6 +36,10 @@ export const GameProvider = ({ children }) => {
         setInitUILobby,
         initSelectPlayer,
         setInitSelectPlayer,
+        isLobby,
+        setIsLobby,
+        isMale,
+        setIsMale,
       }}
     >
       {children}

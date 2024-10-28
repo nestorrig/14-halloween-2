@@ -77,7 +77,7 @@ export const Welcome = () => {
     titleRef.current = new SplitType(".title", {
       types: "chars",
     });
-    gsap.set(titleRef.current.chars, { color: "#3e2b2b", y: "100%" });
+    gsap.set(titleRef.current.chars, { color: "#481E14", y: "100%" });
 
     parrafRef.current = new SplitType(".parraf", {
       types: "words,chars",
@@ -113,7 +113,7 @@ export const Welcome = () => {
       </div>
       <div className="overflow-hidden">
         <button
-          className="enter-btn fixed bottom-4 right-4 lg:static lg:mt-4 border px-2 py-1 hover:border-[#3e2b2b] hover:text-[#3e2b2b] font-Kanit font-light italic text-xl lg:text-2xl transition-all duration-700 text-[#E2DFD0] border-[#E2DFD0] bg-[#0d0d0d] bg-opacity-50"
+          className="enter-btn fixed bottom-4 right-4 lg:static lg:mt-4 border px-2 py-1 hover:border-[#481E14] hover:text-[#481E14] font-Kanit font-light italic text-xl lg:text-2xl transition-all duration-700 text-[#E2DFD0] border-[#E2DFD0] bg-[#0d0d0d] bg-opacity-50"
           onClick={() => setRemoveWelcome(true)}
         >
           Enter the Forest

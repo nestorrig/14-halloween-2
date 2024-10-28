@@ -2,8 +2,11 @@ import { KeyboardControls } from "@react-three/drei";
 import Ecctrl, { EcctrlAnimation } from "ecctrl";
 import { Adventurer, AdventurerFem } from "../Characters";
 import { AdventurerModel, AdventurerFemModel } from "../../../assets/models";
+import { useGameContext } from "../../../context/GameContext";
 
 export const Controller = () => {
+  const { isMale } = useGameContext();
+
   const keyboardMap = [
     { name: "forward", keys: ["ArrowUp", "KeyW"] },
     { name: "backward", keys: ["ArrowDown", "KeyS"] },
@@ -57,11 +60,10 @@ export const Controller = () => {
         <EcctrlAnimation
           animationSet={animationSet}
           // characterURL={AdventurerModel}
-          characterURL={AdventurerFemModel}
+          characterURL={isMale ? AdventurerModel : AdventurerFemModel}
         >
           <group position={[0, -1, 0]} visible={true}>
-            {/* <Adventurer /> */}
-            <AdventurerFem />
+            {isMale ? <Adventurer /> : <AdventurerFem />}
           </group>
         </EcctrlAnimation>
       </Ecctrl>

@@ -4,7 +4,8 @@ import { GiFemale, GiMale } from "react-icons/gi";
 import { useGameContext } from "../../context/GameContext";
 
 export const SelectPlayer = () => {
-  const { initSelectPlayer, setCameraAnimation } = useGameContext();
+  const { initSelectPlayer, setCameraAnimation, setIsLobby, setIsMale } =
+    useGameContext();
   const [removeSelectPlayer, setRemoveSelectPlayer] = useState(false);
   const [playerSelected, setPlayerSelected] = useState(null);
   const timeline = useRef();
@@ -47,7 +48,7 @@ export const SelectPlayer = () => {
     timeline2.current = gsap.timeline();
     timeline.current.pause();
     timeline2.current.pause();
-    // gsap.set(".selectPlayer-container", { display: "none" });
+    gsap.set(".selectPlayer-container", { display: "none" });
     gsap.set(".player-text", { y: "100%" });
     gsap.set(".fem-btn", { x: "-50vw" });
     gsap.set(".male-btn", { x: "50vw" });
@@ -66,6 +67,19 @@ export const SelectPlayer = () => {
     }
   }, [playerSelected]);
 
+  useEffect(() => {
+    if (removeSelectPlayer) {
+      gsap.to(".selectPlayer-container", {
+        duration: 1,
+        opacity: 0,
+        ease: "power3.inOut",
+        onComplete: () => {
+          gsap.set(".selectPlayer-container", { display: "none" });
+        },
+      });
+    }
+  }, [removeSelectPlayer]);
+
   return (
     <div className="selectPlayer-container">
       <h2 className="fixed z-40 top-4 w-full text-center font-Jolly-Lodger text-6xl lg:text-7xl text-[#E2DFD0] select-title">
@@ -73,22 +87,32 @@ export const SelectPlayer = () => {
       </h2>
       <div className="fixed z-40 -bottom-4 lg:bottom-4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-4">
         <button
-          className="fem-btn border border-[#E2DFD0] rounded-full p-2"
+          className="fem-btn border border-[#E2DFD0] rounded-full p-2 group"
           onClick={() => {
             setCameraAnimation(2);
             setPlayerSelected("Carole");
+            setIsMale(false);
           }}
         >
-          <GiFemale size={40} color="#E2DFD0" />
+          <GiFemale
+            size={40}
+            color="#E2DFD0"
+            className="group-hover:scale-110 transition-transform duration-500"
+          />
         </button>
         <button
-          className="male-btn border border-[#E2DFD0] rounded-full p-2"
+          className="male-btn border border-[#E2DFD0] rounded-full p-2 group"
           onClick={() => {
             setCameraAnimation(3);
             setPlayerSelected("Chris");
+            setIsMale(true);
           }}
         >
-          <GiMale size={40} color="#E2DFD0" />
+          <GiMale
+            size={40}
+            color="#E2DFD0"
+            className="group-hover:scale-110 transition-transform duration-500"
+          />
         </button>
       </div>
       <div className="character Carole font-Kanit fixed z-40 text-[#E2DFD0] bottom-20 lg:top-20 lg:bottom-auto p-4 text-end lg:text-start max-w-lg lg:right-1/2">
@@ -116,6 +140,20 @@ export const SelectPlayer = () => {
             than she ever imagined.
           </p>
         </div>
+        <div className="overflow-hidden">
+          <button
+            className="player-text mt-3 py-1 border border-[#E2DFD0] relative group"
+            onClick={() => {
+              setRemoveSelectPlayer(true);
+              setIsLobby(false);
+            }}
+          >
+            <span className="text-xl lg:text-3xl font-Jolly-Lodger px-3 relative z-10">
+              Go to the Forest
+            </span>
+            <div className="absolute w-full h-full scale-x-0 bg-[#481E14] origin-left group-hover:scale-x-100 transition-transform duration-500 -z-0 top-0 left-0"></div>
+          </button>
+        </div>
       </div>
 
       <div className="character Chris font-Kanit fixed z-40 text-[#E2DFD0] bottom-20 lg:top-20 lg:bottom-auto p-4 lg:text-end max-w-lg lg:left-1/2">
@@ -142,6 +180,20 @@ export const SelectPlayer = () => {
             but this time, the forest he's chosen for escape holds unexpected
             horrors, and facing them will be his ultimate test.
           </p>
+        </div>
+        <div className="overflow-hidden">
+          <button
+            className="player-text mt-3 py-1 border border-[#E2DFD0] relative group"
+            onClick={() => {
+              setRemoveSelectPlayer(true);
+              setIsLobby(false);
+            }}
+          >
+            <span className="text-xl lg:text-3xl font-Jolly-Lodger px-3 relative z-10">
+              Go to the Forest
+            </span>
+            <div className="absolute w-full h-full scale-x-0 bg-[#481E14] origin-left group-hover:scale-x-100 transition-transform duration-500 -z-0 top-0 left-0"></div>
+          </button>
         </div>
       </div>
     </div>
