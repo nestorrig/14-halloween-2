@@ -15,20 +15,28 @@ export const SelectPlayer = () => {
     if (initSelectPlayer) {
       gsap.set(".selectPlayer-container", { display: "block" });
 
-      timeline.current.to(".Chris .player-text", {
-        y: "0%",
-        delay: 1.3,
-        duration: 1,
-        stagger: 0.05,
-        ease: "power3.inOut",
-      });
-      timeline2.current.to(".Carole .player-text", {
-        y: "0%",
-        delay: 1.3,
-        duration: 1,
-        stagger: 0.05,
-        ease: "power3.inOut",
-      });
+      timeline.current
+        .to(".Chris .player-text", {
+          y: "0%",
+          delay: 1.3,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power3.inOut",
+        })
+        .to(".Chris", {
+          zIndex: 50,
+        });
+      timeline2.current
+        .to(".Carole .player-text", {
+          y: "0%",
+          delay: 1.3,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power3.inOut",
+        })
+        .to(".Carole", {
+          zIndex: 50,
+        });
 
       gsap.to(".select-title", {
         y: 0,
