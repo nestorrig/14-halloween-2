@@ -45,11 +45,11 @@ export const Loader = () => {
           duration: 1,
           y: "-100%",
           ease: "power3.inOut",
+          onComplete: () => setInitUILobby(true),
         })
         .to(".loader-container", {
           duration: 1,
           display: "none",
-          onComplete: () => setInitUILobby(true),
         });
     }
   }, [animateLoader, progress]);
@@ -61,12 +61,12 @@ export const Loader = () => {
       </h1>
       <div className="w-1/2 h-1 bg-[#3C3D37] origin-center loader-bar">
         <div
-          className="h-full bg-[#A04747]"
+          className="h-full bg-[#3e2b2b]"
           style={{ width: `${progress.progress}%` }}
         ></div>
       </div>
       <button
-        className={`loader-button text-[#A04747] font-Kanit font-light italic text-3xl transition-all duration-700 hover:text-[#E2DFD0] ${
+        className={`loader-button text-[#3e2b2b] font-Kanit font-light italic text-3xl transition-all duration-700 hover:text-[#E2DFD0] ${
           !progress.active ? "opacity-100" : "opacity-0"
         }`}
         disabled={progress.active}

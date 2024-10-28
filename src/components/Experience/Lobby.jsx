@@ -126,7 +126,14 @@ export const Lobby = () => {
       <PerspectiveCamera position={[2, 8, 5]} makeDefault ref={cameraRef} />
 
       {/* target 1: 0, 8, 0 */}
-      <OrbitControls target={[0, 8, 0]} ref={controlsRef} />
+      <OrbitControls
+        target={[0, 8, 0]}
+        ref={controlsRef}
+        enableDamping={false}
+        enableZoom={false}
+        enablePan={false}
+        enableRotate={false}
+      />
 
       {/* Suelo de la escena */}
       <group>

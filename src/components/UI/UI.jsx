@@ -1,5 +1,6 @@
 import { useGameContext } from "../../context/GameContext";
 import { Loader } from "./Loader";
+import { Welcome } from "./Welcome";
 
 export const UI = () => {
   const { setCameraAnimation } = useGameContext();
@@ -7,6 +8,7 @@ export const UI = () => {
   return (
     <>
       <Loader />
+      <Welcome />
       {/* <div className="z-50 absolute w-20 h-10 flex flex-col gap-4">
         <h1>UI</h1>
         <button className="bg-white" onClick={() => setCameraAnimation(1)}>
