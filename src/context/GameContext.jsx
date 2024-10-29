@@ -16,7 +16,8 @@ export const GameProvider = ({ children }) => {
   const [initSelectPlayer, setInitSelectPlayer] = useState(false);
   const [isLobby, setIsLobby] = useState(true);
   const [isMale, setIsMale] = useState(null);
-
+  const [isUIGame, setIsUIGame] = useState(false);
+  const [stopMusic, setStopMusic] = useState(false);
   return (
     <GameContext.Provider
       value={{
@@ -40,6 +41,10 @@ export const GameProvider = ({ children }) => {
         setIsLobby,
         isMale,
         setIsMale,
+        isUIGame,
+        setIsUIGame,
+        stopMusic,
+        setStopMusic,
       }}
     >
       {children}

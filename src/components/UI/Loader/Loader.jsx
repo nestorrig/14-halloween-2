@@ -2,6 +2,7 @@ import { useProgress } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { useGameContext } from "../../../context/GameContext";
 import gsap from "gsap";
+import { isMobile } from "react-device-detect";
 
 export const Loader = () => {
   const { setInitUILobby } = useGameContext();
@@ -9,10 +10,6 @@ export const Loader = () => {
   const progress = useProgress();
 
   useEffect(() => {
-    console.log(progress.progress);
-    console.log(progress.item);
-    console.log(progress);
-
     if (animateLoader && progress.progress === 100) {
       const tl = gsap.timeline();
 
@@ -20,7 +17,7 @@ export const Loader = () => {
         ".loader-button",
         {
           scale: 0,
-          x: "50vw",
+          x: !isMobile ? "50vw" : "0vw",
           duration: 0.7,
           opacity: 0,
         },
@@ -28,7 +25,7 @@ export const Loader = () => {
       )
         .to(".loader-text", {
           scale: 0,
-          x: "-50vw",
+          x: !isMobile ? "-50vw" : "0vw",
           duration: 0.7,
           opacity: 0,
         })

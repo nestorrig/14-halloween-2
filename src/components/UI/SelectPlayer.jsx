@@ -5,8 +5,13 @@ import { useGameContext } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 
 export const SelectPlayer = () => {
-  const { initSelectPlayer, setCameraAnimation, setIsLobby, setIsMale } =
-    useGameContext();
+  const {
+    initSelectPlayer,
+    setCameraAnimation,
+    setIsLobby,
+    setIsMale,
+    setStopMusic,
+  } = useGameContext();
   const [removeSelectPlayer, setRemoveSelectPlayer] = useState(false);
   const [playerSelected, setPlayerSelected] = useState(null);
   const timeline = useRef();
@@ -157,8 +162,9 @@ export const SelectPlayer = () => {
             className="player-text mt-3 py-1 border border-[#E2DFD0] relative group"
             onClick={() => {
               setRemoveSelectPlayer(true);
-              // setIsLobby(false);
-              goToGame();
+              setIsLobby(false);
+              setStopMusic(true);
+              // goToGame();
             }}
           >
             <span className="text-xl lg:text-3xl font-Jolly-Lodger px-3 relative z-10">
@@ -199,8 +205,9 @@ export const SelectPlayer = () => {
             className="player-text mt-3 py-1 border border-[#E2DFD0] relative group"
             onClick={() => {
               setRemoveSelectPlayer(true);
-              // setIsLobby(false);
-              goToGame();
+              setIsLobby(false);
+              setStopMusic(true);
+              // goToGame();
             }}
           >
             <span className="text-xl lg:text-3xl font-Jolly-Lodger px-3 relative z-10">
