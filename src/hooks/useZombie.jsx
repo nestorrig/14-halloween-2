@@ -1,5 +1,5 @@
-import { useEffect, useRef, useMemo } from "react";
-import { useGLTF, useAnimations } from "@react-three/drei";
+import { useEffect, useRef, useMemo, useState } from "react";
+import { useGLTF, useAnimations, PositionalAudio } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 import { useGameContext } from "../context/GameContext";
 import * as THREE from "three";
@@ -9,7 +9,7 @@ import { useGraph, useThree } from "@react-three/fiber";
 const capsuleRadius = 0.8;
 const capsuleHalfHeight = 0.8;
 const attackDistance = 1;
-const detectDistance = 8;
+const detectDistance = 5;
 
 export function useZombie(onDeath) {
   const group = useRef();
@@ -34,6 +34,10 @@ export function useZombie(onDeath) {
   const lastDamageTime = useRef(0);
   const lastHitTime = useRef(0);
   const controller = useGame();
+  const [zombieAudio, setZombieAudio] = useState(
+    "/audio/sounds/zombie-screaming-207590.mp3"
+  );
+  const [audioPlay, setAudioPlay] = useState(false);
   let speed = 0.03;
 
   const changeAnimation = (newAnimation) => {
@@ -47,6 +51,8 @@ export function useZombie(onDeath) {
   const handleDeath = () => {
     changeAnimation("Armature|Die");
     zombieIsDead.current = true;
+    setAudioPlay(true);
+    setZombieAudio("/audio/sounds/zombie-pain-1-95166.mp3");
     actions["Armature|Die"].clampWhenFinished = true;
     actions["Armature|Die"].setLoop(THREE.LoopOnce);
     actions["Armature|Die"].play();
@@ -87,11 +93,14 @@ export function useZombie(onDeath) {
       if (zombieState.current === "patrolling") {
         zombieState.current = "growling";
         changeAnimation("Armature|Scream");
+        setZombieAudio("/audio/sounds/zombie-screaming-207590.mp3");
+        setAudioPlay(true);
 
         setTimeout(() => {
           zombieState.current = "patrolling";
           changeAnimation("Armature|Walk");
           scheduleGrowl();
+          setAudioPlay(false);
         }, 2000);
       }
     }, interval);
@@ -171,6 +180,7 @@ export function useZombie(onDeath) {
           zombieState.current = "patrolling";
         } else {
           changeAnimation("Armature|Attack");
+          setZombieAudio("/audio/sounds/zombie-attack-96528.mp3");
         }
         break;
 
@@ -203,8 +213,12 @@ export function useZombie(onDeath) {
       ) {
         setPlayerHealth((prev) => prev - 1);
         setHitReceived(true);
+        setAudioPlay(true);
         lastHitTime.current = now;
-        setTimeout(() => setHitReceived(false), 1000);
+        setTimeout(() => {
+          setHitReceived(false);
+          setAudioPlay(false);
+        }, 1000);
       }
 
       if (
@@ -212,10 +226,7 @@ export function useZombie(onDeath) {
         now - lastDamageTime.current > 500
       ) {
         zombieHitReceived.current = 2;
-        // changeEmissive(0xff0000); // Indicador visual de daño
-        // receiveDamage(35);
         lastDamageTime.current = now;
-        // setTimeout(() => changeEmissive(0x000000), 300); // Reinicia el color después de 300 ms
       }
 
       if (
@@ -223,10 +234,7 @@ export function useZombie(onDeath) {
         now - lastDamageTime.current > 500
       ) {
         zombieHitReceived.current = 1;
-        // changeEmissive(0xff0000);
-        // receiveDamage(50);
         lastDamageTime.current = now;
-        // setTimeout(() => changeEmissive(0x000000), 300);
       }
     }
 
@@ -246,5 +254,8 @@ export function useZombie(onDeath) {
     updateZombie,
     capsuleRadius,
     capsuleHalfHeight,
+    zombieAudio,
+    audioPlay,
+    // PositionalAudioZombie,
   };
 }

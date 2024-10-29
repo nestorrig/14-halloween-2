@@ -6,7 +6,12 @@ export const PerimeterWall = () => {
     <RigidBody type="fixed" colliders="trimesh">
       <mesh rotation={[0, Math.PI / 4, 0]}>
         <cylinderGeometry args={[45, 45, 45, 4, 1, true]} />
-        <meshStandardMaterial color={"#0d0d0d"} side={THREE.DoubleSide} />
+        <meshBasicMaterial
+          color={"#0d0d0d"}
+          side={THREE.DoubleSide}
+          // transparent
+          // opacity={0.5}
+        />
       </mesh>
     </RigidBody>
   );

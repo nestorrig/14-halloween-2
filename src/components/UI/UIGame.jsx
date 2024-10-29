@@ -3,9 +3,11 @@ import { useGameContext } from "../../context/GameContext";
 import { Loader } from "./Loader";
 import { Howl } from "howler";
 import { Leva } from "leva";
+import { useLocation } from "react-router-dom";
 
 export const UIGame = () => {
   const { isLobby } = useGameContext();
+  const url = useLocation();
 
   const soundRef = useRef();
 
@@ -17,6 +19,9 @@ export const UIGame = () => {
       preload: true,
       autoplay: false,
     });
+    if (url.pathname === "/game" && isLobby) {
+      soundRef.current.play();
+    }
   }, []);
 
   useEffect(() => {

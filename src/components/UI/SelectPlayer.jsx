@@ -90,9 +90,9 @@ export const SelectPlayer = () => {
         duration: 1,
         opacity: 0,
         ease: "power3.inOut",
-        onComplete: () => {
-          gsap.set(".selectPlayer-container", { display: "none" });
-        },
+        // onComplete: () => {
+        //   gsap.set(".selectPlayer-container", { display: "none" });
+        // },
       });
     }
   }, [removeSelectPlayer]);
