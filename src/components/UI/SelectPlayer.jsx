@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { GiFemale, GiMale } from "react-icons/gi";
 import { useGameContext } from "../../context/GameContext";
+import { useNavigate } from "react-router-dom";
 
 export const SelectPlayer = () => {
   const { initSelectPlayer, setCameraAnimation, setIsLobby, setIsMale } =
@@ -10,6 +11,10 @@ export const SelectPlayer = () => {
   const [playerSelected, setPlayerSelected] = useState(null);
   const timeline = useRef();
   const timeline2 = useRef();
+  const navigate = useNavigate();
+  const goToGame = () => {
+    navigate("/game");
+  };
 
   useEffect(() => {
     if (initSelectPlayer) {
@@ -56,7 +61,6 @@ export const SelectPlayer = () => {
     timeline2.current = gsap.timeline();
     timeline.current.pause();
     timeline2.current.pause();
-    gsap.set(".selectPlayer-container", { display: "none" });
     gsap.set(".player-text", { y: "100%" });
     gsap.set(".fem-btn", { x: "-50vw" });
     gsap.set(".male-btn", { x: "50vw" });
@@ -89,7 +93,7 @@ export const SelectPlayer = () => {
   }, [removeSelectPlayer]);
 
   return (
-    <div className="selectPlayer-container">
+    <div className="selectPlayer-container hidden">
       <h2 className="fixed z-40 top-4 w-full text-center font-Jolly-Lodger text-6xl lg:text-7xl text-[#E2DFD0] select-title">
         Select Player
       </h2>
@@ -153,7 +157,8 @@ export const SelectPlayer = () => {
             className="player-text mt-3 py-1 border border-[#E2DFD0] relative group"
             onClick={() => {
               setRemoveSelectPlayer(true);
-              setIsLobby(false);
+              // setIsLobby(false);
+              goToGame();
             }}
           >
             <span className="text-xl lg:text-3xl font-Jolly-Lodger px-3 relative z-10">
@@ -194,7 +199,8 @@ export const SelectPlayer = () => {
             className="player-text mt-3 py-1 border border-[#E2DFD0] relative group"
             onClick={() => {
               setRemoveSelectPlayer(true);
-              setIsLobby(false);
+              // setIsLobby(false);
+              goToGame();
             }}
           >
             <span className="text-xl lg:text-3xl font-Jolly-Lodger px-3 relative z-10">

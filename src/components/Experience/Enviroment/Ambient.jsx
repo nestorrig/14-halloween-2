@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useControls } from "leva";
+import { isMobile } from "react-device-detect";
 // import { useThree } from "@react-three/fiber";
 // import { useHelper } from "@react-three/drei";
 // import * as THREE from "three";
@@ -66,8 +67,8 @@ export const Ambient = ({ sunPosition = [0, 25, -35] }) => {
         position={sunPosition}
         intensity={light.directionalLightIntensity}
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={isMobile ? 2048 : 4096}
+        shadow-mapSize-height={isMobile ? 2048 : 4096}
         shadow-camera-far={80}
         shadow-camera-left={-36}
         shadow-camera-right={36}

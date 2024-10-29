@@ -3,6 +3,7 @@ import Ecctrl, { EcctrlAnimation } from "ecctrl";
 import { Adventurer, AdventurerFem } from "../Characters";
 import { AdventurerModel, AdventurerFemModel } from "../../../assets/models";
 import { useGameContext } from "../../../context/GameContext";
+import { isMobile } from "react-device-detect";
 
 export const Controller = () => {
   const { isMale } = useGameContext();
@@ -50,12 +51,15 @@ export const Controller = () => {
 
         //  third person mode
         mode="FixedCamera"
-        camInitDis={-2}
+        camInitDis={isMobile ? -4 : -2}
         camMoveSpeed={5}
+        camUpLimit={isMobile ? -50 : 1.5}
         animated
         debug
         capsuleHalfHeight={0.5}
         position={[0, 32, 0]}
+        maxVelLimit={isMobile ? 200 : 2.5}
+        friction={isMobile ? 0.3 : -0.5}
       >
         <EcctrlAnimation
           animationSet={animationSet}

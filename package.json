@@ -20,6 +20,7 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
+    "react-router-dom": "^6.27.0",
     "split-type": "^0.3.4",
     "three": "^0.169.0",
     "three.terrain.js": "^2.0.0"
