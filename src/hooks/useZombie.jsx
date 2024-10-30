@@ -50,9 +50,9 @@ export function useZombie(onDeath) {
 
   const handleDeath = () => {
     changeAnimation("Armature|Die");
-    zombieIsDead.current = true;
     setAudioPlay(true);
     setZombieAudio("/audio/sounds/zombie-pain-1-95166.mp3");
+    zombieIsDead.current = true;
     actions["Armature|Die"].clampWhenFinished = true;
     actions["Armature|Die"].setLoop(THREE.LoopOnce);
     actions["Armature|Die"].play();
@@ -164,7 +164,7 @@ export function useZombie(onDeath) {
     const playerPos = new THREE.Vector3(...playerPosition);
     const distanceToPlayer = zombiePosition.distanceTo(playerPos);
 
-    console.log(distanceToPlayer);
+    // console.log(distanceToPlayer);
 
     switch (zombieState.current) {
       case "growling":
@@ -211,14 +211,12 @@ export function useZombie(onDeath) {
         animation.current === "Armature|Attack" &&
         now - lastHitTime.current > 1500
       ) {
-        setPlayerHealth((prev) => prev - 1);
+        setPlayerHealth((prev) => prev - 10);
         setHitReceived(true);
         setAudioPlay(true);
         lastHitTime.current = now;
-        setTimeout(() => {
-          setHitReceived(false);
-          setAudioPlay(false);
-        }, 1000);
+        setTimeout(() => setHitReceived(false), 1000);
+        setTimeout(() => setAudioPlay(false), 300);
       }
 
       if (

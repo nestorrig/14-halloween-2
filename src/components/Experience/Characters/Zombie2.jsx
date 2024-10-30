@@ -26,7 +26,7 @@ export function Zombie({ position, scale, onDeath }) {
         audioRef.current.play();
         setTimeout(() => {
           audioRef.current.stop();
-        }, 5000);
+        }, 2000);
       }
     }
   }, [audioPlay, zombieAudio]);
