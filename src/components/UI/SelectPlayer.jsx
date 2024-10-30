@@ -2,7 +2,7 @@ import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { GiFemale, GiMale } from "react-icons/gi";
 import { useGameContext } from "../../context/GameContext";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 export const SelectPlayer = () => {
   const {
@@ -16,10 +16,10 @@ export const SelectPlayer = () => {
   const [playerSelected, setPlayerSelected] = useState(null);
   const timeline = useRef();
   const timeline2 = useRef();
-  const navigate = useNavigate();
-  const goToGame = () => {
-    navigate("/game");
-  };
+  // const navigate = useNavigate();
+  // const goToGame = () => {
+  //   navigate("/game");
+  // };
 
   useEffect(() => {
     if (initSelectPlayer) {

@@ -6,10 +6,10 @@ import { useGameContext } from "../../context/GameContext";
 export const DiePage = () => {
   const { isDead } = useGameContext();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const navigateToLobby = () => {
-    navigate("/");
+    // navigate("/");
     window.location.reload();
   };
 

@@ -4,23 +4,23 @@ import { Loader } from "./Loader";
 import { SelectPlayer } from "./SelectPlayer";
 import { Welcome } from "./Welcome";
 import { Howl } from "howler";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Leva } from "leva";
 
 export const UI = () => {
   const { initUILobby, stopMusic, isLobby } = useGameContext();
 
   const soundRef = useRef();
-  const navigate = useNavigate();
-  const goToGame = () => {
-    navigate("/game");
-  };
+  // const navigate = useNavigate();
+  // const goToGame = () => {
+  //   navigate("/game");
+  // };
 
   useEffect(() => {
     soundRef.current = new Howl({
       src: ["/audio/music/horror-piano-250870.mp3"],
       volume: 0.5,
-      loop: true,
+      loop: false,
       preload: true,
       autoplay: false,
     });
@@ -33,11 +33,17 @@ export const UI = () => {
   }, [initUILobby]);
 
   useEffect(() => {
-    if (stopMusic) {
+    if (!isLobby) {
       soundRef.current.stop();
-      goToGame();
     }
-  }, [stopMusic]);
+  }, [isLobby]);
+
+  // useEffect(() => {
+  //   if (stopMusic) {
+  //     soundRef.current.stop();
+  //     // goToGame();
+  //   }
+  // }, [stopMusic]);
 
   return (
     <>

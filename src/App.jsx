@@ -4,6 +4,7 @@ import { GameProvider } from "./context/GameContext";
 import { Loader } from "./components/UI/Loader";
 import { Lobby } from "./components/Experience/Lobby";
 import { Game } from "./components/Experience/Game";
+import { Experience } from "./components/Experience/Experience";
 
 // const Lobby = lazy(() => import("./components/Experience/Lobby"));
 // const Game = lazy(() => import("./components/Experience/Game"));
@@ -11,14 +12,15 @@ import { Game } from "./components/Experience/Game";
 function App() {
   return (
     <GameProvider>
-      <Router>
+      {/* <Router>
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="/" element={<Lobby />} />
             <Route path="/game" element={<Game />} />
           </Routes>
         </Suspense>
-      </Router>
+      </Router> */}
+      <Experience />
     </GameProvider>
   );
 }

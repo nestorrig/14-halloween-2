@@ -3,7 +3,7 @@ import { useGameContext } from "../../context/GameContext";
 import { Loader } from "./Loader";
 import { Howl } from "howler";
 import { Leva } from "leva";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import { DiePage } from "./DiePage";
 import { useGame } from "ecctrl";
 import { Health } from "./Health";
@@ -12,7 +12,7 @@ import { Guide } from "./Guide";
 export const UIGame = () => {
   const { isLobby } = useGameContext();
   const { curAnimation } = useGame();
-  const url = useLocation();
+  // const url = useLocation();
 
   const soundRef = useRef();
   const walkSoundRef = useRef();
@@ -36,9 +36,9 @@ export const UIGame = () => {
         walk: [0, 700],
       },
     });
-    if (url.pathname === "/game" && isLobby) {
-      soundRef.current.play();
-    }
+    // if (url.pathname === "/game" && isLobby) {
+    //   soundRef.current.play();
+    // }
   }, []);
 
   useEffect(() => {
