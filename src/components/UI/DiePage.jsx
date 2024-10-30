@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameContext } from "../../context/GameContext";
 
 export const DiePage = () => {
-  const { isDead, setIsDead } = useGameContext();
+  const { isDead } = useGameContext();
 
   const navigate = useNavigate();
 

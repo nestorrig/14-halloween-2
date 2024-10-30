@@ -6,9 +6,11 @@ import { Leva } from "leva";
 import { useLocation } from "react-router-dom";
 import { DiePage } from "./DiePage";
 import { useGame } from "ecctrl";
+import { Health } from "./Health";
+import { Guide } from "./Guide";
 
 export const UIGame = () => {
-  const { isLobby, playerHealth } = useGameContext();
+  const { isLobby } = useGameContext();
   const { curAnimation } = useGame();
   const url = useLocation();
 
@@ -72,13 +74,8 @@ export const UIGame = () => {
       <Leva hidden={true} />
       <Loader />
       <DiePage />
-      <div className="fixed z-30 top-4 left-4 font-Jolly-Lodger text-2xl text-[#E2DFD0]">
-        Health: {playerHealth}
-      </div>
-      <div className="hidden lg:block z-30 fixed top-4 right-4 font-Kanit text-end text-lg text-[#E2DFD0] opacity-35">
-        <p>[1]: Shoot</p>
-        <p>[2]: Punch</p>
-      </div>
+      <Health />
+      <Guide />
     </>
   );
 };

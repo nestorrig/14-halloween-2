@@ -1,9 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useControls } from "leva";
 import { isMobile } from "react-device-detect";
-// import { useThree } from "@react-three/fiber";
-// import { useHelper } from "@react-three/drei";
-// import * as THREE from "three";
 
 export const Ambient = ({ sunPosition = [0, 25, -35] }) => {
   const light = useControls("Sun Position", {
@@ -39,23 +36,7 @@ export const Ambient = ({ sunPosition = [0, 25, -35] }) => {
     },
   });
 
-  // const { scene } = useThree();
   const lightRef = useRef();
-
-  // useHelper(lightRef, THREE.DirectionalLightHelper, "cyan");
-  // useEffect(() => {
-  //   let directionalLightCameraHelper;
-  //   if (lightRef.current.shadow.camera) {
-  //     directionalLightCameraHelper = new THREE.CameraHelper(
-  //       lightRef.current.shadow.camera
-  //     );
-  //     scene.add(directionalLightCameraHelper);
-  //   }
-
-  //   return () => {
-  //     scene.remove(directionalLightCameraHelper);
-  //   };
-  // }, [scene]);
 
   return (
     <>
@@ -67,18 +48,13 @@ export const Ambient = ({ sunPosition = [0, 25, -35] }) => {
         position={sunPosition}
         intensity={light.directionalLightIntensity}
         castShadow
-        shadow-mapSize-width={isMobile ? 2048 : 4096}
-        shadow-mapSize-height={isMobile ? 2048 : 4096}
+        shadow-mapSize-width={isMobile ? 2048 : 2048}
+        shadow-mapSize-height={isMobile ? 2048 : 2048}
         shadow-camera-far={80}
         shadow-camera-left={-36}
         shadow-camera-right={36}
         shadow-camera-top={36}
         shadow-camera-bottom={-36}
-        // position={[
-        //   light.directionalLightX,
-        //   light.directionalLightY,
-        //   light.directionalLightZ,
-        // ]}
       />
     </>
   );

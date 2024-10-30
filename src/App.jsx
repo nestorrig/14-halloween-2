@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { GameProvider } from "./context/GameContext";
 import { Loader } from "./components/UI/Loader";

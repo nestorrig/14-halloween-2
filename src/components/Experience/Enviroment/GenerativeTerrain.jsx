@@ -118,7 +118,7 @@ export function GenerativeTerrain({ onTerrainLoaded }) {
       step: 8,
     },
     maxHeight: {
-      value: 12,
+      value: 7,
       min: 5,
       max: 120,
       step: 5,

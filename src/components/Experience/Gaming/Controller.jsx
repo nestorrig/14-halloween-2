@@ -58,8 +58,10 @@ export const Controller = () => {
         debug
         capsuleHalfHeight={0.5}
         position={[0, 32, 0]}
-        maxVelLimit={isMobile ? 10 : 2.5}
-        friction={isMobile ? 0.3 : -0.5}
+        maxVelLimit={isMobile ? 10 : 5}
+        // maxVelLimit={6}
+        friction={isMobile ? 0.3 : 0.3}
+        // friction={0.3}
       >
         <EcctrlAnimation
           animationSet={animationSet}

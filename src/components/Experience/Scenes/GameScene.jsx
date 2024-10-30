@@ -14,7 +14,7 @@ export const GameScene = () => {
   };
 
   return (
-    <Canvas shadows dpr={isMobile ? [0.8, 0.8] : [1, 2]}>
+    <Canvas shadows dpr={isMobile ? [0.8, 0.8] : [0.8, 0.8]}>
       <Ambient />
       <Physics gravity={[0, -9.8, 0]}>
         <GenerativeTerrain onTerrainLoaded={handleTerrainLoaded} />
