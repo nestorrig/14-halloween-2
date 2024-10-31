@@ -15,8 +15,8 @@ export const Controller = () => {
     { name: "rightward", keys: ["ArrowRight", "KeyD"] },
     { name: "jump", keys: ["Space"] },
     { name: "run", keys: ["Shift"] },
-    { name: "action1", keys: ["1"] },
-    { name: "action2", keys: ["2"] },
+    { name: "action1", keys: ["KeyQ"] },
+    { name: "action2", keys: ["KeyE"] },
     { name: "action3", keys: ["3"] },
     { name: "action4", keys: ["KeyF"] },
   ];

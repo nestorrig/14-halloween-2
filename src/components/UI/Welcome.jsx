@@ -119,6 +119,12 @@ export const Welcome = () => {
           Enter the Forest
         </button>
       </div>
+      <button
+        className="skip-btn fixed bottom-4 left-4 lg:mt-4 border px-2 py-1 hover:border-[#481E14] hover:text-[#481E14] font-Kanit font-light italic text-xl lg:text-2xl transition-all duration-700 text-[#E2DFD0] border-[#E2DFD0] bg-[#0d0d0d] bg-opacity-50"
+        onClick={() => setRemoveWelcome(true)}
+      >
+        Skip
+      </button>
     </div>
   );
 };
